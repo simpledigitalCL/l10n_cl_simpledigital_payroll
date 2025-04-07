@@ -160,22 +160,22 @@ class hr_indicadores_previsionales(models.Model):
     ipc = fields.Float(
         'IPC',  required=True, readonly=True, states=STATES, help="Indice de Precios al Consumidor (IPC)")
     
-        def action_done(self):
+    def action_done(self):
         self.write({'state': 'done'})
         return True
-    
-        def action_draft(self):
+
+    def action_draft(self):
         self.write({'state': 'draft'})
         return True
 
-        @api.onchange('month')
+    @api.onchange('month')
     def get_name(self):
         self.name = str(self.month).replace('10', 'Octubre').replace('11', 'Noviembre').replace('12', 'Diciembre').replace('1', 'Enero').replace('2', 'Febrero').replace('3', 'Marzo').replace('4', 'Abril').replace('5', 'Mayo').replace('6', 'Junio').replace('7', 'Julio').replace('8', 'Agosto').replace('9', 'Septiembre') + " " + str(self.year)
 
-    def find_between_r(self, s, first, last ):
+    def find_between_r(self, s, first, last):
         try:
-            start = s.rindex( first ) + len( first )
-            end = s.rindex( last, start )
+            start = s.rindex(first) + len(first)
+            end = s.rindex(last, start)
             return s[start:end]
         except ValueError:
             return ""
