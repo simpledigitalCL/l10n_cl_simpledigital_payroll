@@ -25,13 +25,10 @@
         "data/l10n_cl_hr_isapre.xml",
         "data/l10n_cl_hr_payroll_data.xml",
         "data/partner.xml",
-        "data/resource_calendar_attendance.xml",
-        "views/isapre_view.xml",
+        "data/resource_calendar_attendance.xml"
     ],
     "installable": True,
     "application": False,
     "price": 150.00,
-    "currency": "EUR",
-    "price": 49.99,
-    "currency": "USD",
+    "currency": "USD"
 }
