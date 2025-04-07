@@ -1,12 +1,28 @@
 {
     "name": "Nómina Chilena Simpledigital",
     "version": "18.0.1.0.0",
-    "category": "Localization",
+    "category": "Localization/Chile",
     "summary": "Módulo de nómina chilena desarrollado por Simpledigital.cl",
+    "description": """
+Módulo de Nómina para Chile desarrollado por Simpledigital.cl
+
+- Remuneraciones completas con leyes chilenas
+- Cálculo automático de AFP, Isapres, APV, CCAF, Mutual
+- Exportación Previred
+- Libros de remuneraciones
+- Asistencia, vacaciones y licencias médicas
+- Informes personalizados
+    """,
     "author": "Simpledigital.cl",
     "website": "https://simpledigital.cl",
+    "contributors": [
+        "Claudio Poblete <contacto@simpledigital.cl>",
+    ],
     "license": "AGPL-3",
     "depends": ["hr_payroll", "l10n_cl"],
+    "external_dependencies": {
+        "python": ["requests", "bs4"]
+    },
     "data": [
         "security/ir.model.access.csv",
 
@@ -52,7 +68,8 @@
         "data/resource_calendar_attendance.xml"
     ],
     "installable": True,
-    "application": False,
+    "application": True,
+    "auto_install": False,
     "price": 150.00,
     "currency": "USD"
 }
