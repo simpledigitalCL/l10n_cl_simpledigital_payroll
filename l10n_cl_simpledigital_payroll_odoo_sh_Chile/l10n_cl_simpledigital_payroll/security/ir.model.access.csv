@@ -8,7 +8,7 @@ access_hr_employee_user,access.hr.employee.user,model_hr_employee,base.group_use
 access_hr_holidays_user,access.hr.holidays.user,model_hr_holidays,base.group_user,1,1,1,1
 access_hr_indicadores_user,access.hr.indicadores.user,model_hr_indicadores,base.group_user,1,1,1,1
 access_hr_isapre_user,access.hr.isapre.user,model_hr_isapre,base.group_user,1,1,1,1
-access_hr_mutualidad_user,access.hr.mutualidad.user,model_hr_mutual,base.group_user,1,1,1,1
+access_hr_mutual_user,access.hr.mutual.user,model_hr_mutual,base.group_user,1,1,1,1
 access_hr_payslip_user,access.hr.payslip.user,model_hr_payslip,base.group_user,1,1,1,1
 access_hr_payslip_employees_user,access.hr.payslip.employees.user,model_hr_payslip_employees,base.group_user,1,1,1,1
 access_hr_payslip_run_user,access.hr.payslip.run.user,model_hr_payslip_run,base.group_user,1,1,1,1
