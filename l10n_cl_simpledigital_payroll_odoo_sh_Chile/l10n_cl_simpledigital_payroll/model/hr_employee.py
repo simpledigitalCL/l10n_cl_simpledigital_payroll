@@ -1,7 +1,7 @@
 import re
 import logging
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -9,14 +9,24 @@ _logger = logging.getLogger(__name__)
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
-    
-    firstname = fields.Char("Firstname")
-    last_name = fields.Char("Last Name")
-    middle_name = fields.Char("Middle Name", help='Employees middle name')
-    mothers_name = fields.Char("Mothers Name", help='Employees mothers name')
-    type_id = fields.Many2one('hr.type.employee', 'Tipo de Empleado')
-    formated_vat = fields.Char(translate=True, string='Printable VAT', store=True, help='Show formatted vat')
 
+    # Campos de nombres
+    firstname = fields.Char(string="Nombre")
+    middle_name = fields.Char(string="Segundo Nombre", help='Segundo nombre del empleado')
+    last_name = fields.Char(string="Apellido Paterno")
+    mothers_name = fields.Char(string="Apellido Materno", help='Apellido materno del empleado')
+    formated_vat = fields.Char(string='RUT Formateado', store=True, help='Muestra el RUT con puntos y guión')
+
+    # Identificación previsional
+    afp_id = fields.Many2one('hr.afp', string='AFP')
+    isapre_id = fields.Many2one('hr.isapre', string='Isapre')
+    apv_id = fields.Many2one('hr.apv', string='APV')
+    ccaf_id = fields.Many2one('hr.ccaf', string='CCAF')
+    mutual_id = fields.Many2one('hr.mutual', string='Mutualidad')
+    seguro_complementario_id = fields.Many2one('hr.seguro.complementario', string='Seguro Complementario')
+    tipo_empleado_id = fields.Many2one('hr.type.employee', string='Tipo de Empleado')
+
+    # Nombre completo dinámico
     @api.model
     def _get_computed_name(self, last_name, firstname, last_name2=None, middle_name=None):
         names = []
@@ -33,46 +43,49 @@ class HrEmployee(models.Model):
     @api.onchange('firstname', 'mothers_name', 'middle_name', 'last_name')
     def get_name(self):
         if self.firstname and self.last_name:
-            self.name = self._get_computed_name(self.last_name, self.firstname, self.mothers_name, self.middle_name)
+            self.name = self._get_computed_name(
+                last_name=self.last_name,
+                firstname=self.firstname,
+                last_name2=self.mothers_name,
+                middle_name=self.middle_name,
+            )
 
+    # Formato de RUT
     @api.onchange('identification_id')
     def onchange_document(self):
-        identification_id = (
-            re.sub('[^1234567890Kk]', '',
-            str(self.identification_id))).zfill(9).upper()
-        self.identification_id = '%s.%s.%s-%s' % (
-            identification_id[0:2], identification_id[2:5], identification_id[5:8],
-            identification_id[-1])
+        if self.identification_id:
+            raw = re.sub('[^0-9Kk]', '', self.identification_id).zfill(9).upper()
+            self.identification_id = '%s.%s.%s-%s' % (
+                raw[0:2], raw[2:5], raw[5:8], raw[-1])
 
+    # Validación de RUT
     def check_identification_id_cl(self, identification_id):
-        body, vdig = '', ''
+        if not identification_id:
+            return True
         if len(identification_id) > 9:
-            identification_id = identification_id.replace('-','',1).replace('.','',2)
+            identification_id = identification_id.replace('-', '', 1).replace('.', '', 2)
         if len(identification_id) != 9:
-            raise UserError(u'El Rut no tiene formato')
-        else:
-            body, vdig = identification_id[:-1], identification_id[-1].upper()
+            raise UserError(_('El RUT no tiene el formato correcto'))
+        body, vdig = identification_id[:-1], identification_id[-1].upper()
         try:
-            vali = range(2,8) + [2,3]
-            operar = '0123456789K0'[11 - (
-                sum([int(digit)*factor for digit, factor in zip(
-                    body[::-1],vali)]) % 11)]
-            if operar == vdig:
-                return True
-            else:
-                raise UserError(u'El Rut no tiene formato')
-        except IndexError:
-            raise UserError(u'El Rut no tiene formato')
+            factors = [2, 3, 4, 5, 6, 7] * 2
+            s = sum([int(d) * f for d, f in zip(body[::-1], factors)])
+            res = 11 - (s % 11)
+            dv = '0' if res == 11 else 'K' if res == 10 else str(res)
+            if dv != vdig:
+                raise UserError(_('El RUT no es válido'))
+        except Exception:
+            raise UserError(_('El RUT no es válido'))
 
+    # Restricción de unicidad del RUT
     @api.constrains('identification_id')
     def _rut_unique(self):
-        for r in self:
-            if not r.identification_id:
+        for record in self:
+            if not record.identification_id:
                 continue
-            employee = self.env['hr.employee'].search(
-                [
-                    ('identification_id', '=', r.identification_id),
-                    ('id', '!=', r.id),
-                ])
-            if r.identification_id != "55.555.555-5" and employee:
-                raise UserError(u'El Rut debe ser único')
+            existing = self.env['hr.employee'].search([
+                ('identification_id', '=', record.identification_id),
+                ('id', '!=', record.id),
+            ])
+            if record.identification_id != "55.555.555-5" and existing:
+                raise UserError(_('El RUT debe ser único'))
