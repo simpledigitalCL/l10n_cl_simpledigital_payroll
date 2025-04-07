@@ -1,9 +1,15 @@
-from odoo import api, fields, models, tools, _
+from odoo import api, fields, models, _
 
 
-class hr_ccaf(models.Model):
+class HrCcaf(models.Model):
     _name = 'hr.ccaf'
-    _description = 'CCAF'
-    
-    codigo = fields.Char('Codigo', required=True)
-    name = fields.Char('Nombre', required=True)
+    _description = _('Caja de Compensación (CCAF)')
+    _order = 'name'
+
+    codigo = fields.Char(string='Código', required=True)
+    name = fields.Char(string='Nombre', required=True)
+
+    _sql_constraints = [
+        ('codigo_unique', 'unique(codigo)', 'El código debe ser único.'),
+        ('name_unique', 'unique(name)', 'El nombre debe ser único.'),
+    ]
