@@ -1,8 +1,15 @@
-from odoo import api, fields, models, tools, _
+from odoo import api, fields, models, _
 
 
-class hr_apv(models.Model):
+class HrApv(models.Model):
     _name = 'hr.apv'
-    _description = 'Institución Autorizada APV - APVC : Cias Seguros de Vida'
-    codigo = fields.Char('Codigo', required=True)
-    name = fields.Char('Nombre', required=True)
+    _description = _('Institución Autorizada APV/APVC - Compañías de Seguros de Vida')
+    _order = 'name'
+
+    codigo = fields.Char(string='Código', required=True)
+    name = fields.Char(string='Nombre', required=True)
+
+    _sql_constraints = [
+        ('codigo_unique', 'unique(codigo)', 'El código debe ser único.'),
+        ('name_unique', 'unique(name)', 'El nombre debe ser único.'),
+    ]
