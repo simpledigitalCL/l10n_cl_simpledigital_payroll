@@ -215,7 +215,7 @@ class hr_indicadores_previsionales(models.Model):
     def update_document(self):
         self.update_date = datetime.today()
         try:
-            html_doc = urlopen('https://www.previred.com/web/previred/indicadores-previsionales').read()
+            html_doc = urlopen('https://www.previred.com/indicadores-previsionales').read()
             soup = BeautifulSoup(html_doc, 'html.parser')
 
             letters = soup.find_all("table")
