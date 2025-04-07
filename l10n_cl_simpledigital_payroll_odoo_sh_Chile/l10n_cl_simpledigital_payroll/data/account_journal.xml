@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>						
-<odoo>						
-    <data>      
-        <!-- Account Journal -->
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Diario contable para Remuneraciones -->
         <record id="payroll_journal" model="account.journal">
             <field name="name">Remuneraciones</field>
             <field name="code">REMU</field>
             <field name="type">general</field>
             <field name="show_on_dashboard" eval="True"/>
+            <field name="company_id" ref="base.main_company"/>
         </record>
-        
-    </data>						
-</odoo>						
+
+    </data>
+</odoo>
