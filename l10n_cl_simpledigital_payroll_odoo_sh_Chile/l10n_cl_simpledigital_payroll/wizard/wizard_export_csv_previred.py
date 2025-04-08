@@ -470,3 +470,4 @@ class WizardExportCsvPrevired(models.TransientModel):
                     })
                 
         return self.show_view(u'Previred Generado')
+
