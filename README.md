@@ -21,6 +21,24 @@ Este repositorio contiene el módulo `l10n_cl_simpledigital_payroll`, compatible
 - Indicadores previsionales automáticos
 - Exportación a Previred y Libro de Remuneraciones
 - Reportes en PDF y validación de RUT chileno
+  
+## Requiere los siguientes módulos:
+
+- hr
+- hr_contract
+- hr_payroll
+- hr_work_entry
+- hr_holidays
+- account
+- l10n_cl
+
+## Funcionalidades
+
+- Cálculo de remuneraciones según legislación chilena
+- Gestión de AFP, Isapre, APV, CCAF, Mutual
+- Exportación a Previred
+- Libro de remuneraciones y reportes
+- Vacaciones, licencias médicas y asistencia
 
 ## 📦 Información técnica
 
