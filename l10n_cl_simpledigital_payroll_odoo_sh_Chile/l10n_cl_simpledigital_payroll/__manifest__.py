@@ -19,15 +19,17 @@ Características principales:
         "Claudio Poblete <contacto@simpledigital.cl>",
     ],
     "license": "AGPL-3",
-    "depends": [
-        "hr",               # Base de empleados
-        "hr_contract",      # Contratos de trabajo
-        "hr_payroll",       # Estructura de nómina
-        "hr_work_entry",    # Entradas de trabajo (asistencia)
-        "hr_holidays",      # Vacaciones y licencias
-        "account",          # Contabilidad
-        "l10n_cl",          # Localización contable chilena
-    ],
+"depends": [
+    "hr",
+    "hr_contract",
+    "hr_work_entry",
+    "hr_holidays",
+    "hr_payroll",
+    "hr_payroll_account", 
+    "hr_payroll_holidays",      
+    "account",
+    "l10n_cl"
+],
     "external_dependencies": {
         "python": [
             "requests",
