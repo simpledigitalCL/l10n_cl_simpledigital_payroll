@@ -296,13 +296,13 @@ class WizardExportCsvPrevired(models.TransientModel):
                              #3- Datos Ahorro Previsional Voluntario Individual
                              #40 Código de la Institución APVI
                              payslip.contract_id.apv_id.codigo if self.get_payslip_lines_value_2(payslip,'APV') else "0",
-                             #41 Numero de Contrato APVI Strinng
+                             #41 Numero de Contrato APVI String
                              "0",
                              #42 Forma de Pago Ahorro
                              payslip.contract_id.forma_pago_apv if self.get_payslip_lines_value_2(payslip,'APV') else "0",
                              #43 Cotización APVI 9(8) Monto en $ de la Cotización APVI
-                            int(self.get_payslip_lines_value_2(payslip, 'APV') or 0)
-                             #44 Cotizacion Depositos 
+                             int(self.get_payslip_lines_value_2(payslip, 'APV') or 0),
+                             #44 Cotizacion Depositos
                              
                              #45 Codigo Institucion Autorizada APVC
                              "0",
