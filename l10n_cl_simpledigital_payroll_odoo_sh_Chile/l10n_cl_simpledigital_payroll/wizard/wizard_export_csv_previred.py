@@ -182,15 +182,17 @@ class WizardExportCsvPrevired(models.TransientModel):
         sexo_data = {'male': "M", 'female': "F"}
         _logger = logging.getLogger(__name__)
         country_company = self.env.user.company_id.country_id
-            output = io.StringIO()
-            if self.delimiter_option == 'none':
-                writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quoting=csv.QUOTE_NONE)
-            else:
-                writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quotechar=self.quotechar[self.delimiter_option], quoting=csv.QUOTE_NONE)
-            #Debemos colocar que tome todo el mes y no solo el día exacto TODO
-            payslip_recs = payslip_model.search([('date_from','=',self.date_from),
-                                                 ])
-
+    
+        output = io.StringIO()
+        if self.delimiter_option == 'none':
+            writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quoting=csv.QUOTE_NONE)
+        else:
+            writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quotechar=self.quotechar[self.delimiter_option], quoting=csv.QUOTE_NONE)
+    
+        # Debemos colocar que tome todo el mes y no solo el día exacto TODO
+        payslip_model = self.env['hr.payslip']  # (esto faltaba si no está definido antes)
+        payslip_recs = payslip_model.search([('date_from', '=', self.date_from)])
+    
         date_start = self.date_from
         date_stop = self.date_to
         date_start_format = date_start.strftime("%m%Y")
@@ -264,7 +266,7 @@ class WizardExportCsvPrevired(models.TransientModel):
                              #25 Solicitud Trabajador Joven TODO SUBSIDIO JOVEN
                              "N",
                              #26
-                             payslip.contract_id.afp_id.codigo,
+                             payslip.contract_id.afp_id.codigo if payslip.contract_id.afp_id else "00"
                              #27
                              int(self.get_imponible_afp_2(payslip and payslip[0] or False, self.get_payslip_lines_value_2(payslip,'TOTIM'), self.get_payslip_lines_value_2(payslip,'IMPLIC'))),
                              #AFP SIS APV 0 0 0 0 0 0
