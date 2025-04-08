@@ -13,8 +13,6 @@ class hr_salary_employee_bymonth(models.TransientModel):
 
     end_date = fields.Date(string='End Date', required=True, default=_get_default_end_date)
 
-
-    @api.multi
     def print_report(self):
         """
          To get the date and print the report
