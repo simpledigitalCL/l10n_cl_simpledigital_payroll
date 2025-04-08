@@ -178,12 +178,10 @@ class WizardExportCsvPrevired(models.TransientModel):
         return cadena
     
     def action_generate_csv(self):
-        employee_model = self.env['hr.employee']
-        payslip_model = self.env['hr.payslip']
         payslip_line_model = self.env['hr.payslip.line']
         sexo_data = {'male': "M", 'female': "F"}
-            _logger = logging.getLogger(__name__)
-            country_company = self.env.user.company_id.country_id
+        _logger = logging.getLogger(__name__)
+        country_company = self.env.user.company_id.country_id
             output = io.StringIO()
             if self.delimiter_option == 'none':
                 writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quoting=csv.QUOTE_NONE)
@@ -205,8 +203,9 @@ class WizardExportCsvPrevired(models.TransientModel):
 
         try:
             rut_emp, rut_emp_dv = self.env.user.company_id.vat.split("-")
-            rut_emp = rut_emp.replace('.','')
-        except:
+        except ValueError:
+            rut_emp = self.env.user.company_id.vat
+            rut_emp_dv = ''
             pass  
 
 
@@ -214,8 +213,12 @@ class WizardExportCsvPrevired(models.TransientModel):
             payslip_line_recs = payslip_line_model.search([('slip_id','=',payslip.id)])
             rut = ""
             rut_dv = ""
+        try:
             rut, rut_dv = payslip.employee_id.identification_id.split("-")
-            rut = rut.replace('.','')
+        except ValueError:
+            rut = payslip.employee_id.identification_id
+            rut_dv = ''
+            rut = rut.strip().replace('.', '')
             line_employee = [self._acortar_str(rut, 11), 
                              self._acortar_str(rut_dv, 1),
                              self._arregla_str(payslip.employee_id.last_name.upper(), 30)  if payslip.employee_id.last_name else "", 
@@ -296,7 +299,7 @@ class WizardExportCsvPrevired(models.TransientModel):
                              #42 Forma de Pago Ahorro
                              payslip.contract_id.forma_pago_apv if self.get_payslip_lines_value_2(payslip,'APV') else "0",
                              #43 Cotización APVI 9(8) Monto en $ de la Cotización APVI
-                             int(self.get_payslip_lines_value_2(payslip,'APV')) if self.get_payslip_lines_value_2(payslip,'APV') else "0",
+                            int(self.get_payslip_lines_value_2(payslip, 'APV') or 0)
                              #44 Cotizacion Depositos 
                              
                              #45 Codigo Institucion Autorizada APVC
@@ -412,7 +415,7 @@ class WizardExportCsvPrevired(models.TransientModel):
                              #TODO ES HACER PANTALLA CON DATOS EMPRESA
                              payslip.indicadores_id.ccaf_id.codigo if payslip.indicadores_id.ccaf_id.codigo else "00",
                              #84 Renta Imponible CCAF 
-                             int(self.get_imponible_afp(payslip and payslip[0] or False, self.get_payslip_lines_value_2(payslip,'TOTIM'))) if (self.get_dias_trabajados(payslip and payslip[0] or False)>0) else "00",
+                             int(self.get_imponible_afp(payslip and payslip[0] or False, self.get_payslip_lines_value_2(payslip,'TOTIM'))) if self.get_dias_trabajados(payslip)>0) else "00",
                              #85 Creditos Personales CCAF TODO
                              self.get_payslip_lines_value_2(payslip,'PCCAF') if self.get_payslip_lines_value_2(payslip,'PCCAF') else "0",
                              #86 Descuento Dental CCAF
