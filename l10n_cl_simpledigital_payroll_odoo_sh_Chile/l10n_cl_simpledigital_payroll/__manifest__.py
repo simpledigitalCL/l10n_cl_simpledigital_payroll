@@ -6,12 +6,12 @@
     "description": """
 Módulo de Nómina para Chile desarrollado por Simpledigital.cl
 
-- Remuneraciones completas con leyes chilenas
-- Cálculo automático de AFP, Isapres, APV, CCAF, Mutual
-- Exportación Previred
-- Libros de remuneraciones
-- Asistencia, vacaciones y licencias médicas
-- Informes personalizados
+Características principales:
+- Remuneraciones completas según legislación chilena.
+- Cálculo automático de AFP, Isapres, APV, CCAF, Mutual.
+- Exportación a Previred.
+- Libros de remuneraciones y reportes personalizados.
+- Gestión de asistencia, vacaciones y licencias médicas.
     """,
     "author": "Simpledigital.cl",
     "website": "https://simpledigital.cl",
@@ -19,17 +19,20 @@ Módulo de Nómina para Chile desarrollado por Simpledigital.cl
         "Claudio Poblete <contacto@simpledigital.cl>",
     ],
     "license": "AGPL-3",
-"depends": [
-    "hr",
-    "hr_contract",
-    "hr_payroll",        # estructura básica
-    "hr_work_entry",
-    "hr_holidays",       # vacaciones (hr.leave)
-    "account",           # contabilidad
-    "l10n_cl",           # localización chilena contable
-],
+    "depends": [
+        "hr",               # Base de empleados
+        "hr_contract",      # Contratos de trabajo
+        "hr_payroll",       # Estructura de nómina
+        "hr_work_entry",    # Entradas de trabajo (asistencia)
+        "hr_holidays",      # Vacaciones y licencias
+        "account",          # Contabilidad
+        "l10n_cl",          # Localización contable chilena
+    ],
     "external_dependencies": {
-        "python": ["requests", "bs4"]
+        "python": [
+            "requests",
+            "bs4"
+        ]
     },
     "data": [
         "security/ir.model.access.csv",
