@@ -1,4 +1,3 @@
-
 import io
 import csv
 import base64
@@ -43,7 +42,6 @@ class WizardExportCsvPrevired(models.TransientModel):
         ('tab',"Tabulador"),
         ], string='Separador de Campos', default='dot_coma', required=True)
     
-    @api.multi
     def show_view(self, name):
         search_ids = self.env['wizard.export.csv.previred'].search([])
         last_id = search_ids and max(search_ids)        
@@ -58,87 +56,65 @@ class WizardExportCsvPrevired(models.TransientModel):
             'target': 'new',
         }
 
-    @api.model
     def get_nacionalidad(self, employee):
-        #0 chileno, 1 extranjero, comparar con el pais de la compañia
+        # 0 chileno, 1 extranjero, comparar con el país de la compañía
         if employee == 46:
             return 0
-        else:
-            return 1
-        
-    @api.model
-    def get_tipo_pago(self, employee):
-        #01 Remuneraciones del mes
-        #02 Gratificaciones
-        #03 Bono Ley de Modernizacion Empresas Publicas
-        #TODO: en base a que se elije el tipo de pago???
         return 1
     
-    @api.model
+    def get_tipo_pago(self, employee):
+        # 01 Remuneraciones del mes
+        # 02 Gratificaciones
+        # 03 Bono Ley de Modernización Empresas Públicas
+        # TODO: en base a qué se elige el tipo de pago???
+        return 1
+    
     def get_regimen_provisional(self, contract):
-        if contract.pension is True:
-            return 'SIP'
-        else:
-            return 'AFP'
+        return 'SIP' if contract.pension else 'AFP'
     
-    @api.model
     def get_tipo_trabajador(self, employee):
-
-        if employee.type_id is False:
+        if not employee.type_id:
             return 0
-        else:
-            tipo_trabajador = employee.type_id.id_type
-
-        #Codigo    Glosa
-        #id_type
-        #0        Activo (No Pensionado)
-        #1        Pensionado y cotiza
-        #2        Pensionado y no cotiza
-        #3        Activo > 65 años (nunca pensionado)
-        return tipo_trabajador
+        return employee.type_id.id_type
+        # Código Glosa
+        # 0 Activo (No Pensionado)
+        # 1 Pensionado y cotiza
+        # 2 Pensionado y no cotiza
+        # 3 Activo > 65 años (nunca pensionado)
     
-    @api.model
     def get_dias_trabajados(self, payslip):
         worked_days = 0
         if payslip:
             for line in payslip.worked_days_line_ids:
-                    if line.code == 'WORK100':
-                        worked_days = line.number_of_days
+                if line.code == 'WORK100':
+                    worked_days = line.number_of_days
         return worked_days
-
-    @api.model
+    
     def get_cost_center(self, contract):
-        cost_center = "1"
-        if contract.analytic_account_id:
-            cost_center = contract.analytic_account_id.code
-        return cost_center
-
-
-    @api.model
+        return contract.analytic_account_id.code if contract.analytic_account_id else "1"
+    
     def get_tipo_linea(self, payslip):
-        #00 Linea Principal o Base
-        #01 Linea Adicional
-        #02 Segundo Contrato
-        #03 Movimiento de Personal Afiliado Voluntario
+        # 00 Línea Principal o Base
+        # 01 Línea Adicional
+        # 02 Segundo Contrato
+        # 03 Movimiento de Personal Afiliado Voluntario
         return '00'
-
-
-    @api.model
+    
     def get_tramo_asignacion_familiar(self, payslip, valor):
         try:
-            if payslip.contract_id.carga_familiar != 0 and payslip.indicadores_id.asignacion_familiar_tercer >= payslip.contract_id.wage and payslip.contract_id.pension is False:
-                if payslip.indicadores_id.asignacion_familiar_primer >= valor:
+            contrato = payslip.contract_id
+            indicadores = payslip.indicadores_id
+            if contrato.carga_familiar != 0 and indicadores.asignacion_familiar_tercer >= contrato.wage and not contrato.pension:
+                if indicadores.asignacion_familiar_primer >= valor:
                     return 'A'
-                elif payslip.indicadores_id.asignacion_familiar_segundo  >= valor:
+                elif indicadores.asignacion_familiar_segundo >= valor:
                     return 'B'
-                elif payslip.indicadores_id.asignacion_familiar_tercer  >= valor:
+                elif indicadores.asignacion_familiar_tercer >= valor:
                     return 'C'
-            else:
-                return 'D' 
-        except:
-            return 'D' 
-            
-    
+            return 'D'
+        except Exception:
+            return 'D'
+
     def get_payslip_lines_value(self, obj, regla):
         try:
             linea = obj.search([('code','=',regla)])
@@ -150,118 +126,72 @@ class WizardExportCsvPrevired(models.TransientModel):
     def get_payslip_lines_value_2(self, obj, regla):
         valor = 0
         lineas = self.env['hr.payslip.line']
-        detalle = lineas.search([('slip_id','=',obj.id),('code','=',regla)])
+        detalle = lineas.search([('slip_id', '=', obj.id), ('code', '=', regla)])
         valor = detalle.amount
-        return valor        
-
-    @api.model
+        return valor
+    
     def get_imponible_afp(self, payslip, TOTIM):
-        if payslip.contract_id.pension is True:
+        if payslip.contract_id.pension:
             return '0'
-        elif TOTIM >=round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf):
-            return round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf)
-        else:
-            return round(TOTIM)
-
-    @api.model
+        tope = round(payslip.indicadores_id.tope_imponible_afp * payslip.indicadores_id.uf)
+        return round(tope if TOTIM >= tope else TOTIM)
+    
     def get_imponible_afp_2(self, payslip, TOTIM, LIC):
         if LIC > 0:
-            TOTIM=LIC
-        if payslip.contract_id.pension is True:
+            TOTIM = LIC
+        if payslip.contract_id.pension:
             return '0'
-        elif TOTIM >=round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf):
-            return int(round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf))      
-        else:
-            return int(round(TOTIM))
-
-    @api.model
+        tope = round(payslip.indicadores_id.tope_imponible_afp * payslip.indicadores_id.uf)
+        return int(round(tope if TOTIM >= tope else TOTIM))
+    
     def get_imponible_mutual(self, payslip, TOTIM):
-        if payslip.contract_id.mutual_seguridad is False:
+        contrato = payslip.contract_id
+        if not contrato.mutual_seguridad or contrato.type_id.name == 'Sueldo Empresarial':
             return 0
-        elif payslip.contract_id.type_id.name == 'Sueldo Empresarial':
-            return 0 
-        elif TOTIM >=round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf):
-            return round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf)
-        else:
-            return round(TOTIM)    
-
-    @api.model
+        tope = round(payslip.indicadores_id.tope_imponible_afp * payslip.indicadores_id.uf)
+        return round(tope if TOTIM >= tope else TOTIM)
+    
     def get_imponible_seguro_cesantia(self, payslip, TOTIM, LIC):
         if LIC > 0:
-            TOTIM=LIC
-        if payslip.contract_id.pension is True:
+            TOTIM = LIC
+        contrato = payslip.contract_id
+        if contrato.pension or contrato.type_id.name == 'Sueldo Empresarial':
             return 0
-        elif payslip.contract_id.type_id.name == 'Sueldo Empresarial':
-            return 0
-        elif TOTIM >=round(payslip.indicadores_id.tope_imponible_seguro_cesantia*payslip.indicadores_id.uf):
-            return int(round(payslip.indicadores_id.tope_imponible_seguro_cesantia*payslip.indicadores_id.uf))
-        else:
-            return int(round(TOTIM))
-
-    @api.model
+        tope = round(payslip.indicadores_id.tope_imponible_seguro_cesantia * payslip.indicadores_id.uf)
+        return int(round(tope if TOTIM >= tope else TOTIM))
+    
     def get_imponible_salud(self, payslip, TOTIM):
-        result = 0
-        if TOTIM >= round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf):
-            return int(round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf))
-        else:
-            return int(round(TOTIM))
-
-    @api.model
+        tope = round(payslip.indicadores_id.tope_imponible_afp * payslip.indicadores_id.uf)
+        return int(round(tope if TOTIM >= tope else TOTIM))
+    
     def _acortar_str(self, texto, size=1):
-        c = 0
-        cadena = ""
-        while c < size and c < len(texto):
-            cadena += texto[c]
-            c += 1
-        return cadena
-
-
-    @api.model
+        return texto[:size]
+    
     def _arregla_str(self, texto, size=1):
-        c = 0
-        cadena = ""
+        cadena = texto[:size]
         special_chars = [
-         ['á', 'a'],
-         ['é', 'e'],
-         ['í', 'i'],
-         ['ó', 'o'],
-         ['ú', 'u'],
-         ['ñ', 'n'],
-         ['Á', 'A'],
-         ['É', 'E'],
-         ['Í', 'I'],
-         ['Ó', 'O'],
-         ['Ú', 'U'],
-         ['Ñ', 'N']]
-
-        while c < size and c < len(texto):
-            cadena += texto[c]
-            c += 1
-        for char in special_chars:
-            try:
-                cadena = cadena.replace(char[0], char[1])
-            except:
-                pass
+            ['á', 'a'], ['é', 'e'], ['í', 'i'], ['ó', 'o'], ['ú', 'u'], ['ñ', 'n'],
+            ['Á', 'A'], ['É', 'E'], ['Í', 'I'], ['Ó', 'O'], ['Ú', 'U'], ['Ñ', 'N']
+        ]
+        for original, reemplazo in special_chars:
+            cadena = cadena.replace(original, reemplazo)
         return cadena
     
-    @api.multi
     def action_generate_csv(self):
         employee_model = self.env['hr.employee']
         payslip_model = self.env['hr.payslip']
-        payslip_line_model = self.env['hr.payslip.line']       
-        sexo_data = {'male': "M",
-                     'female': "F",
-                     }
-        _logger = logging.getLogger(__name__)
-        country_company = self.env.user.company_id.country_id
-        output = io.StringIO()
-        if self.delimiter_option == 'none':
-            writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quoting=csv.QUOTE_NONE)
-        else:
-            writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quotechar=self.quotechar[self.delimiter_option], quoting=csv.QUOTE_NONE)
-        #Debemos colocar que tome todo el mes y no solo el día exacto TODO
-        payslip_recs = payslip_model.search([('date_from','=',self.date_from),
-                                             ])
+        payslip_line_model = self.env['hr.payslip.line']
+        sexo_data = {'male': "M", 'female': "F"}
+            _logger = logging.getLogger(__name__)
+            country_company = self.env.user.company_id.country_id
+            output = io.StringIO()
+            if self.delimiter_option == 'none':
+                writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quoting=csv.QUOTE_NONE)
+            else:
+                writer = csv.writer(output, delimiter=self.delimiter[self.delimiter_field_option], quotechar=self.quotechar[self.delimiter_option], quoting=csv.QUOTE_NONE)
+            #Debemos colocar que tome todo el mes y no solo el día exacto TODO
+            payslip_recs = payslip_model.search([('date_from','=',self.date_from),
+                                                 ])
 
         date_start = self.date_from
         date_stop = self.date_to
