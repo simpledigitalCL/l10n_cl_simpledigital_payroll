@@ -19,7 +19,15 @@ Módulo de Nómina para Chile desarrollado por Simpledigital.cl
         "Claudio Poblete <contacto@simpledigital.cl>",
     ],
     "license": "AGPL-3",
-    "depends": ["hr_payroll", "l10n_cl", "hr_holidays"],
+"depends": [
+    "hr",
+    "hr_contract",
+    "hr_payroll",        # estructura básica
+    "hr_work_entry",
+    "hr_holidays",       # vacaciones (hr.leave)
+    "account",           # contabilidad
+    "l10n_cl",           # localización chilena contable
+],
     "external_dependencies": {
         "python": ["requests", "bs4"]
     },
