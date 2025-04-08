@@ -212,15 +212,12 @@ class hr_indicadores_previsionales(models.Model):
         if s == '12':
             return 'Diciembre'
 
-
-
-    @api.one
-    def update_document(self):
-        self.update_date = datetime.today()
+def update_document(self):
+    for record in self:
+        record.update_date = datetime.today()
         try:
             html_doc = urlopen('https://www.previred.com/indicadores-previsionales').read()
             soup = BeautifulSoup(html_doc, 'html.parser')
-
             letters = soup.find_all("table")
 
             def clear_string(cad):
@@ -230,6 +227,14 @@ class hr_indicadores_previsionales(models.Model):
                 cad = cad.replace(",", '.')
                 cad = cad.replace("1ff8","")
                 return cad
+
+            def string_divide(cad, cad2, rounded):
+                return round(float(cad) / float(cad2), rounded)
+
+            # 🔁 Asegúrate de que TODO lo que esté en este método use `record.` en lugar de `self.`
+            # Por ejemplo:
+            record.uf = clear_string(letters[0].select("strong")[1].get_text())
+
         except ValueError:
             return ""
 
