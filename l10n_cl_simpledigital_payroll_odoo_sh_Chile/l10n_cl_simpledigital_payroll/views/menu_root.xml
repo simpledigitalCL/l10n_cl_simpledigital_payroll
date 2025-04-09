@@ -57,7 +57,7 @@
         id="hr_payroll.menu_hr_payslip_run"
         name="Lotes de Nómina"
         parent="menu_cl_hr_payroll_base"
-        action="hr_payroll.action_hr_payslip_run"
+        action="hr_payroll_holidays.hr_payslip_run_view_tree"
         sequence="20"
         groups="hr_payroll.group_hr_payroll_user"
     />
