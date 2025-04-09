@@ -38,8 +38,8 @@ Características principales:
     },
     "data": [
         "security/ir.model.access.csv",
-
         "views/menu_root.xml",
+        "views/actions.xml",
         "views/hr_afp_view.xml",
         "views/hr_isapre_view.xml",
         "views/hr_indicadores_previsionales_view.xml",
