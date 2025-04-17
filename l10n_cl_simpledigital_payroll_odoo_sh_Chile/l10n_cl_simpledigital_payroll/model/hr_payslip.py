@@ -29,13 +29,24 @@ class HrPayslip(models.Model):
     date_start_mp = fields.Date('Fecha Inicio MP',  help="Fecha de inicio del movimiento de personal")
     date_end_mp = fields.Date('Fecha Fin MP',  help="Fecha del fin del movimiento de personal")
 
+    #Modificado 17/04/2025 para manejar operaciones en lote (batch), puede recibir una lista de diccionarios en vez de un solo diccionario.
     @api.model
-    def create(self, vals):
-        if 'indicadores_id' in self.env.context:
-            vals['indicadores_id'] = self.env.context.get('indicadores_id')
-        if 'movimientos_personal' in self.env.context:
-            vals['movimientos_personal'] = self.env.context.get('movimientos_personal')
-        return super(HrPayslip, self).create(vals)
+    def create(self, vals_list):
+        if isinstance(vals_list, dict):
+            vals_list = [vals_list]
+        
+        # Obtener valores del contexto una sola vez
+        indicadores_id = self.env.context.get('indicadores_id')
+        movimientos_personal = self.env.context.get('movimientos_personal')
+        
+        # Aplicar los valores del contexto a todos los registros
+        for vals in vals_list:
+            if indicadores_id is not None and 'indicadores_id' not in vals:
+                vals['indicadores_id'] = indicadores_id
+            if movimientos_personal is not None and 'movimientos_personal' not in vals:
+                vals['movimientos_personal'] = movimientos_personal
+        
+        return super(HrPayslip, self).create(vals_list)
 
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):

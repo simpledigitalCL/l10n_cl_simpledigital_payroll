@@ -1,3 +1,6 @@
+#Modificado 17-04-2025 para agregar _valid_field_parameter debido al uso de
+#el pámetro states en múltiples campos, pero Odoo moderno requiere que este 
+#parámetro sea explícitamente permitido 
 from odoo import api, fields, models, tools, _
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -22,11 +25,18 @@ class hr_indicadores_previsionales(models.Model):
     _name = 'hr.indicadores'
     _description = 'Indicadores Previsionales'
 
+    @api.model
+    def _valid_field_parameter(self, field, name):
+        """Permitir el parámetro 'states' para todos los campos"""
+        return name == 'states' or super()._valid_field_parameter(field, name)
+
     name = fields.Char('Nombre')
     state = fields.Selection([
         ('draft','Borrador'),
         ('done','Validado'),
         ], string=u'Estado', readonly=True, default='draft')
+
+    # Campos con parámetro states (todos siguen el mismo patrón)    
     asignacion_familiar_primer = fields.Float(
         'Asignación Familiar Tramo 1', 
         readonly=True, states=STATES,
