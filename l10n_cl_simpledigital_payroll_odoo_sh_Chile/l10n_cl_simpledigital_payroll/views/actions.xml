@@ -34,7 +34,7 @@
     </record>
 
     <!-- Acción: Lotes de Nómina -->
-    <record id="action_hr_payslip_run_tree" model="ir.actions.act_window">
+    <record id="action_hr_payslip_run_tree" model="ir.actions.act_window" module="l10n_cl_simpledigital_payroll">
         <field name="name">Lotes de Nómina</field>
         <field name="res_model">hr.payslip.run</field>
         <field name="view_mode">tree,form</field>
