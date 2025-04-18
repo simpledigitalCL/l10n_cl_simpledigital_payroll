@@ -43,14 +43,8 @@
               parent="menu_hr_payroll_root" sequence="1"
               groups="hr_contract.group_hr_contract_manager"/>
 
-    <!-- Reubicar menús existentes de nómina -->
-    <menuitem
-        id="hr_payroll.menu_hr_payslip_run"
-        name="Lotes de Nómina"
-        parent="menu_cl_hr_payroll_base"
-        action="l10n_cl_simpledigital_payroll.action_hr_payslip_run_tree"
-        sequence="10"
-        groups="hr_payroll.group_hr_payroll_user"/>
+    <!-- Reubicar menús existentes de nómina pendiente -->
+
     
     <!-- DATOS MAESTROS -->
     <menuitem id="cl_hr_menu_hr_job_tree"
