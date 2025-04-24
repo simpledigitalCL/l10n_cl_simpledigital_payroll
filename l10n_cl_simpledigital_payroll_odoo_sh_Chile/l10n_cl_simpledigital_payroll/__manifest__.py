@@ -38,6 +38,7 @@ Características principales:
     },
     "data": [
         "security/ir.model.access.csv",
+        'views/hr_chile_menus.xml',
         "views/menu_root.xml",
         "views/actions.xml",
         "views/hr_afp_view.xml",
