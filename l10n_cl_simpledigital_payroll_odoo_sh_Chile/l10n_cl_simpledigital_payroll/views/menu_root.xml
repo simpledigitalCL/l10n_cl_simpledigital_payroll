@@ -44,14 +44,13 @@
               groups="hr_contract.group_hr_contract_manager"/>
 
     <!-- Reubicar menús existentes de nómina pendiente -->
-    <menuitem
-        id="hr_payroll.menu_department_tree"
-        name="Nóminas de Empleados"
-        parent="menu_cl_hr_payroll_base"
-        action="hr_payroll.action_view_hr_payslip_form"
-        sequence="10"
-        groups="hr_payroll.group_hr_payroll_user"
-    />
+    <menuitem id="hr_payroll.menu_hr_payslip_run" 
+              name="Lotes de Nomina" 
+              parent="menu_cl_hr_payroll_base" 
+              action="hr_payroll_holidays.hr_payslip_run_view_tree" 
+              sequence="20" 
+              groups="hr_payroll.group_hr_payroll_user"/>
+
     
     <!-- DATOS MAESTROS -->
     <menuitem id="cl_hr_menu_hr_job_tree"
