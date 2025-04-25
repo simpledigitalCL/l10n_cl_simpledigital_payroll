@@ -3,12 +3,12 @@
     <data>
 
         <!-- Estructura de menú "NÓMINA RRHH"  -->
-        <menuitem id="menu_cl_hr_payroll_base" name="Nomina RRHH" parent="hr_payroll.menu_hr_payroll_root" sequence="2" groups="hr_payroll.group_hr_payroll_user"/>
-        <menuitem id="menu_cl_hr_payroll_addons" name="Adicionales Nómina" parent="hr_payroll.menu_hr_payroll_root" sequence="3"/>
-        <menuitem id="menu_cl_hr_payroll_indicators" name="Previsión" parent="hr_payroll.menu_hr_payroll_root" sequence="4" groups="hr_payroll.group_hr_payroll_user"/>
-        <menuitem id="menu_cl_hr_payroll_master_data" name="Master Data" parent="hr_payroll.menu_hr_payroll_root" sequence="5"/>
-        <menuitem id="menu_cl_hr_payroll_reports" name="Reports" parent="hr_payroll.menu_hr_payroll_root" sequence="6" groups="hr_payroll.group_hr_payroll_user"/>
-        <menuitem id="menu_cl_hr_payroll_configuration" name="Chilean Configuration" parent="hr_payroll.menu_hr_payroll_configuration" sequence="101" groups="hr_payroll.group_hr_payroll_user"/>
+        <menuitem id="menu_cl_hr_payroll_base" name="Nomina RRHH" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="2" groups="hr_payroll.group_hr_payroll_user"/>
+        <menuitem id="menu_cl_hr_payroll_addons" name="Adicionales Nómina" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="3"/>
+        <menuitem id="menu_cl_hr_payroll_indicators" name="Previsión" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="4" groups="hr_payroll.group_hr_payroll_user"/>
+        <menuitem id="menu_cl_hr_payroll_master_data" name="Master Data" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="5"/>
+        <menuitem id="menu_cl_hr_payroll_reports" name="Reports" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="6" groups="hr_payroll.group_hr_payroll_user"/>
+        <menuitem id="menu_cl_hr_payroll_configuration" name="Chilean Configuration" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="101" groups="hr_payroll.group_hr_payroll_user"/>
 
         <!-- Acción Vista CUENTAS BANCARIAS EMPLEADOS  -->
 		<record model="ir.actions.act_window" id="cl_hr_partner_bank_account_action_tree_view">
@@ -32,8 +32,8 @@
 
 		
         <!-- Menu items EMPLEADOS y CONTRATOS  -->
-        <!--<menuitem action="hr.open_view_employee_list_my"                 id="cl_hr_menu_open_view_employee_list_my"   parent="hr_payroll.menu_hr_payroll_root"       sequence="0"/>-->
-        <menuitem action="hr_contract.action_hr_contract"                id="cl_hr_contract_hr_menu_contract"         parent="hr_payroll.menu_hr_payroll_root"       sequence="1"    groups="hr_contract.group_hr_contract_manager" name="Contracts"/>
+        <!--<menuitem action="hr.open_view_employee_list_my"                 id="cl_hr_menu_open_view_employee_list_my"   parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"       sequence="0"/>-->
+        <menuitem action="hr_contract.action_hr_contract"                id="cl_hr_contract_hr_menu_contract"         parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"       sequence="1"    groups="hr_contract.group_hr_contract_manager" name="Contracts"/>
 
 
         <!-- Menu NÓMINA RRHH -->
