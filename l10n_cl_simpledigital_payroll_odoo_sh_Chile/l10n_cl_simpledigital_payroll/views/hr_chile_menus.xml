@@ -3,7 +3,7 @@
     <data>
 
         <!-- Estructura de menú "NÓMINA RRHH"  -->
-        <menuitem id="menu_cl_hr_payroll_base" name="Nómina RRHH" parent="hr_payroll.menu_hr_payroll_root" sequence="2" groups="hr_payroll.group_hr_payroll_user"/>
+        <menuitem id="menu_cl_hr_payroll_base" name="Nomina RRHH" parent="hr_payroll.menu_hr_payroll_root" sequence="2" groups="hr_payroll.group_hr_payroll_user"/>
         <menuitem id="menu_cl_hr_payroll_addons" name="Adicionales Nómina" parent="hr_payroll.menu_hr_payroll_root" sequence="3"/>
         <menuitem id="menu_cl_hr_payroll_indicators" name="Previsión" parent="hr_payroll.menu_hr_payroll_root" sequence="4" groups="hr_payroll.group_hr_payroll_user"/>
         <menuitem id="menu_cl_hr_payroll_master_data" name="Master Data" parent="hr_payroll.menu_hr_payroll_root" sequence="5"/>
