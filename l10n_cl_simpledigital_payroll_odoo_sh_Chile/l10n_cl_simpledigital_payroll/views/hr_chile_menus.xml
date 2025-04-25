@@ -15,7 +15,6 @@
 			<field name="name">Cuentas Bancarias Empleados</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">res.partner.bank</field>
-			<field name="view_type">tree</field>
 			<field name="view_mode">tree,kanban,form</field>
 			<field name="view_id" ref="base.view_partner_bank_tree"/>
 			<field name="search_view_id" ref="base.view_partner_bank_search"/>
