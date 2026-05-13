@@ -1,0 +1,25 @@
+<odoo>
+    <record id="view_hr_previred_txt_wizard_form" model="ir.ui.view">
+        <field name="name">hr.previred.txt.wizard.form</field>
+        <field name="model">hr.previred.txt.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Exportar Archivo Previred TXT">
+                <group>
+                    <field name="period"/>
+                </group>
+                <footer>
+                    <button string="Generar TXT" type="object" name="action_generate_txt" class="btn-primary"/>
+                    <!-- <button string="Generar CSV" type="object" name="action_generate_csv" class="btn-success"/> -->
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_previred_txt_wizard" model="ir.actions.act_window">
+        <field name="name">Exportar TXT Previred</field>
+        <field name="res_model">hr.previred.txt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

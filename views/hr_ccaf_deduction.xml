@@ -1,0 +1,48 @@
+<odoo>
+    <record id="action_hr_ccaf_deduction" model="ir.actions.act_window">
+        <field name="name">Descuentos CCAF</field>
+        <field name="res_model">hr.ccaf.deduction</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Gestión de descuentos por CCAF (Crédito, Leasing, Seguro, etc.).</p>
+        </field>
+    </record>
+
+    <record id="view_hr_ccaf_deduction_tree" model="ir.ui.view">
+        <field name="name">hr.ccaf.deduction.tree</field>
+        <field name="model">hr.ccaf.deduction</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="deduction_type"/>
+                <field name="ccaf"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_hr_ccaf_deduction_search" model="ir.ui.view">
+        <field name="name">hr.ccaf.deduction.search</field>
+        <field name="model">hr.ccaf.deduction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="deduction_type"/>
+                <field name="ccaf"/>
+                <filter name="archived" string="Archivados" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_ccaf_deduction" model="ir.actions.act_window">
+        <field name="search_view_id" ref="view_hr_ccaf_deduction_search"/>
+    </record>
+
+    <!-- Menu item en Empleados  -->
+    <menuitem
+        id="hr_ccaf_deduction_menu"
+        name="Descuentos CCAF"
+        sequence="10"
+        parent="hr.menu_hr_employee_payroll"
+        action="action_hr_ccaf_deduction"
+    />
+</odoo>

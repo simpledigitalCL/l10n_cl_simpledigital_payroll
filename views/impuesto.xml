@@ -1,0 +1,118 @@
+<odoo>
+    <!-- Vista List Impuestos -->
+    <record id="view_impuesto_2da_categoria_list" model="ir.ui.view">
+        <field name="name">impuesto_2da_categoria.tree</field>
+        <field name="model">impuesto_2da_categoria</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Form Impuestos -->
+    <record id="view_impuesto_2da_categoria_form" model="ir.ui.view">
+        <field name="name">impuesto_2da_categoria.form</field>
+        <field name="model">impuesto_2da_categoria</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_scraping_impuesto_2da_categoria" type="object" string="Scrapear Datos SII" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="currency_id" invisible="1" />
+                            
+                            <field name="first_line_to"/>
+                            
+                            <label for="second_line_from" string="Segunda Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="second_line_from" placeholder="1.000.0000" />
+                                <field name="second_line_to" placeholder="1.100.0000" />
+                                <field name="second_line_factor" placeholder="0,2" />
+                                <field name="second_line_tasa_rebaja" placeholder="10.000" />
+                            </div>
+                            
+                            <label for="third_line_from" string="Tercera Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="third_line_from"/>
+                                <field name="third_line_to"/>
+                                <field name="third_line_factor"/>
+                                <field name="third_line_tasa_rebaja" />
+                            </div>
+
+                            <label for="fourth_line_from" string="Cuarta Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="fourth_line_from"/>
+                                <field name="fourth_line_to"/>
+                                <field name="fourth_line_factor"/>
+                                <field name="fourth_line_tasa_rebaja" />
+                            </div>
+
+                            <label for="fifth_line_from" string="Cuarta Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="fifth_line_from"/>
+                                <field name="fifth_line_to"/>
+                                <field name="fifth_line_factor"/>
+                                <field name="fifth_line_tasa_rebaja" />
+                            </div>
+
+                            <label for="sixth_line_from" string="Sexta Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="sixth_line_from"/>
+                                <field name="sixth_line_to"/>
+                                <field name="sixth_line_factor"/>
+                                <field name="sixth_line_tasa_rebaja" />
+                            </div>
+
+                            <label for="sixth_line_from" string="Sexta Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="seventh_line_from"/>
+                                <field name="seventh_line_to"/>
+                                <field name="seventh_line_factor"/>
+                                <field name="seventh_line_tasa_rebaja" />
+                            </div>
+
+                            <label for="eighth_line_from" string="Octava Línea"/>
+                            <div style="display: flex; gap: 10px;">
+                                <field name="eighth_line_from"/>
+                                <field name="eighth_line_factor"/>
+                                <field name="eighth_line_tasa_rebaja" />
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter reload_on_attachment="True"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_impuesto_2da_categoria" model="ir.actions.act_window">
+        <field name="name">Impuestos 2da Categoria</field>
+        <field name="res_model">impuesto_2da_categoria</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menuitem SII en Configuraciones -->
+    <menuitem 
+        id="menu_hr_payroll_sii"
+        name="SII"
+        parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+        sequence="120"
+        groups="hr_payroll.group_hr_payroll_manager"
+    />
+
+    <!-- Menuitem Impuestos 2da Categoria -->
+    <menuitem 
+        id="menu_hr_payroll_impuesto_2da_categoria"
+        name="Impuestos 2da Categoria"
+        parent="menu_hr_payroll_sii"
+        sequence="10"
+        action="l10n_cl_simpledigital_payroll.action_impuesto_2da_categoria"
+    />
+</odoo>

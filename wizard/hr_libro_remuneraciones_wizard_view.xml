@@ -1,0 +1,40 @@
+<odoo>
+    <record id="view_hr_libro_remuneraciones_wizard_form" model="ir.ui.view">
+        <field name="name">hr.libro.remuneraciones.wizard.form</field>
+        <field name="model">hr.libro.remuneraciones.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Exportar Libro de Remuneraciones">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="include_header"/>
+                    </group>
+                </group>
+                
+                <div class="oe_chatter">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Información:</strong><br/>
+                        • El archivo CSV contendrá todas las liquidaciones del período seleccionado<br/>
+                        • Solo se incluirán liquidaciones en estado "Hecho" o "Pagado"<br/>
+                        • Se usará la empresa actual del usuario para filtrar las liquidaciones
+                    </div>
+                </div>
+
+                <footer>
+                    <button name="action_generate_csv" 
+                            string="Generar CSV" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button name="action_preview" 
+                            string="Vista Previa" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,144 @@
+<odoo>
+    <!-- Placeholder for RUT identification number -->
+    <record id="view_employee_form_inherit_identification_placeholder" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.identification.placeholder</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Placeholder for RUT identification number -->
+            <field name="identification_id" position="attributes">
+                <attribute name="placeholder">000.000.000-0</attribute>
+            </field>
+
+            <!-- Campo gender requerido -->
+            <field name="gender" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+
+            <!-- Campo identification_id requerido -->
+            <field name="identification_id" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+
+            <!-- campo country_id requerido -->
+            <field name="country_id" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+
+            <!-- Campo birthday requerido -->
+            <field name="birthday" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Page para hr_ccf_credit -->
+    <record id="view_employee_form_inherit_ccaf_credit" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.ccaf.credit</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_payroll']" position="after">
+                <!-- Campos ocultos para las condiciones de visibilidad -->
+                <field name="company_has_ccaf" invisible="1"/>
+                <page string="Descuentos CCAF" name="ccaf_deductions" 
+                      invisible="not company_has_ccaf">
+                    <group>
+                        <field name="ccaf_deduction_ids">
+                            <list editable="bottom">
+                                <field name="ccaf" column_invisible="1" />
+                                <field name="deduction_type" />
+                                <field name="total_amount"/>
+                                <field name="installment_amount"/>
+                                <field name="total_installments"/>
+                                <field name="remaining_installments"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="active"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar campo de comuna -->
+    <record id="view_employee_form_inherit_region_comuna" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.region.comuna</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div/field[@name='private_city']" position="replace">
+                <field name="hr_commune" placeholder="Comuna" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar campo de invalidez -->
+    <record id="view_employee_form_inherit_disability" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.disability</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='emergency_contact']" position="before">
+                <field name="has_disability" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar campo causal_contract_end_id -->
+    <record id="view_employee_form_inherit_causal_contract_end" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.causal.contract.end</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <group>
+                    <field name="causal_contract_end_id" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar botón para ver liquidaciones del empleado (vista HR) -->
+    <record id="view_employee_form_inherit_payslip_button" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.payslip.button</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="can_view_payslips" invisible="1"/>
+                <button name="action_view_payslips"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-money"
+                        invisible="payslip_count == 0 or not can_view_payslips"
+                        groups="base.group_user">
+                    <field name="payslip_count" widget="statinfo" string="Liquidaciones"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar botón para ver liquidaciones del empleado (vista personal del empleado) -->
+    <record id="hr_employee_view_form_inherit_payslip_button" model="ir.ui.view">
+        <field name="name">hr.employee.personal.form.inherit.payslip.button</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="can_view_payslips" invisible="1"/>
+                <button name="action_view_payslips"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-money"
+                        invisible="payslip_count == 0 or not can_view_payslips"
+                        groups="base.group_user">
+                    <field name="payslip_count" widget="statinfo" string="Liquidaciones"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+ 

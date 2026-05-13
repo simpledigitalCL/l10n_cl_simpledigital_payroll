@@ -1,0 +1,180 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Crear 4 empleados -->
+        
+        <!-- Empleado 1: Juan Carlos Pérez -->
+        <record id="employee_juan_perez" model="hr.employee">
+            <field name="name">Testing Employee 1</field>
+            <field name="identification_id">2.513.733-7</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="gender">male</field>
+            <field name="birthday">1985-03-15</field>
+            <field name="work_email">juan.perez@empresa.cl</field>
+            <field name="work_phone">+56912345678</field>
+            <field name="job_title">Desarrollador Senior</field>
+        </record>
+
+        <!-- Empleado 2: María José Silva -->
+        <record id="employee_maria_silva" model="hr.employee">
+            <field name="name">María José Silva</field>
+            <field name="identification_id">5.270.377-8</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="gender">female</field>
+            <field name="birthday">1990-07-22</field>
+            <field name="work_email">maria.silva@empresa.cl</field>
+            <field name="work_phone">+56923456789</field>
+            <field name="job_title">Analista de Recursos Humanos</field>
+        </record>
+
+        <!-- Empleado 3: Carlos Alberto Rodríguez -->
+        <record id="employee_carlos_rodriguez" model="hr.employee">
+            <field name="name">Carlos Alberto Rodríguez</field>
+            <field name="identification_id">8.149.492-4</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="gender">male</field>
+            <field name="birthday">1988-11-08</field>
+            <field name="work_email">carlos.rodriguez@empresa.cl</field>
+            <field name="work_phone">+56934567890</field>
+            <field name="job_title">Contador</field>
+        </record>
+
+        <!-- Empleado 4: Ana Lucía Mendoza -->
+        <record id="employee_ana_mendoza" model="hr.employee">
+            <field name="name">Ana Lucía Mendoza</field>
+            <field name="identification_id">8.159.437-6</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="gender">female</field>
+            <field name="birthday">1992-05-30</field>
+            <field name="work_email">ana.mendoza@empresa.cl</field>
+            <field name="work_phone">+56945678901</field>
+            <field name="job_title">Gerente de Ventas</field>
+        </record>
+        
+        <!-- Tipos de Contrato -->
+        <record id="contract_type_indefinido" model="hr.contract.type">
+            <field name="name">Contrato Indefinido</field>
+        </record>
+        
+        <record id="contract_type_plazo_fijo" model="hr.contract.type">
+            <field name="name">Contrato a Plazo Fijo</field>
+        </record>
+        
+        <!-- Contratos para los empleados -->
+        
+        <!-- Contrato para Juan Pérez -->
+        <record id="contract_juan_perez" model="hr.contract">
+            <field name="name">Contrato Juan Pérez</field>
+            <field name="employee_id" ref="employee_juan_perez"/>
+            <field name="contract_type_id" ref="contract_type_indefinido"/>
+            <field name="date_start">2024-01-01</field>
+            <field name="wage">1500000</field>
+            <field name="movility">100000</field>
+            <field name="colocation">50000</field>
+            <field name="has_gratification">True</field>
+            <field name="health_institution">07 - 102</field>
+            <field name="fonasa_type">b</field>
+            <field name="pension_option">afp</field>
+            <field name="afp_option">08 - 6</field> 
+            <field name="afc_enrolled">True</field>
+            <field name="state">open</field>
+        </record>
+        
+        <!-- Contrato para María Silva -->
+        <record id="contract_maria_silva" model="hr.contract">
+            <field name="name">Contrato María Silva</field>
+            <field name="employee_id" ref="employee_maria_silva"/>
+            <field name="contract_type_id" ref="contract_type_indefinido"/>
+            <field name="date_start">2024-02-01</field>
+            <field name="wage">1200000</field>
+            <field name="movility">100000</field>
+            <field name="colocation">50000</field>
+            <field name="has_extra_hours">True</field>
+            <field name="extra_hours">4</field>
+            <field name="has_gratification">True</field>
+            <field name="health_institution">01 - 3</field>
+            <field name="isapre_calc_type">plan</field>
+            <field name="isapre_plan_monto">85000</field>
+            <field name="pension_option">afp</field>
+            <field name="afp_option">08 - 6</field> 
+            <field name="afc_enrolled">True</field>
+            <field name="has_apvi">True</field>
+            <field name="institucion_apvi_apvc">008</field>
+            <field name="pay_format_apvi_apc">1</field>
+            <field name="cotizacion_apvi">23000</field>
+            <field name="state">open</field>
+        </record>
+        
+        <!-- Contrato para Carlos Rodríguez -->
+        <record id="contract_carlos_rodriguez" model="hr.contract">
+            <field name="name">Contrato Carlos Rodríguez</field>
+            <field name="employee_id" ref="employee_carlos_rodriguez"/>
+            <field name="contract_type_id" ref="contract_type_plazo_fijo"/>
+            <field name="date_start">2024-03-01</field>
+            <field name="date_end">2025-12-31</field>
+            <field name="wage">0</field>
+            <field name="wage_type">hourly</field>
+            <field name="hourly_wage">6700</field>
+            <field name="health_institution">04 - 4</field> 
+            <field name="isapre_calc_type">plan</field>
+            <field name="isapre_plan_monto">120000</field>
+            <field name="pension_option">afp</field>
+            <field name="afp_option">29 - 11</field> 
+            <field name="state">open</field>
+        </record>
+        
+        <!-- Contrato para Ana Mendoza -->
+        <record id="contract_ana_mendoza" model="hr.contract">
+            <field name="name">Contrato Ana Mendoza</field>
+            <field name="employee_id" ref="employee_ana_mendoza"/>
+            <field name="contract_type_id" ref="contract_type_indefinido"/>
+            <field name="date_start">2024-04-01</field>
+            <field name="wage">2200000</field>
+            <field name="has_gratification">True</field>
+            <field name="health_institution">07 - 102</field> 
+            <field name="fonasa_type">c</field>
+            <field name="pension_option">afp</field>
+            <field name="afp_option">03 - 13</field>
+            <field name="afc_enrolled">True</field>
+            <field name="has_family_loads">True</field>
+            <field name="family_loads_segment">c</field>
+            <field name="family_simple_loads_count">2</field>
+            <field name="family_maternal_loads_count">1</field>
+            <field name="state">open</field>
+        </record>
+
+        <!-- Tiempo personal -->
+
+        <!-- Vacaciones empleado Juan Carlos Perez por 4 dias-->
+        <record id="vacation_juan_perez" model="hr.leave">
+            <field name="employee_id" ref="employee_juan_perez"/>
+            <field name="holiday_status_id" ref="l10n_cl_simpledigital_payroll.hr_leave_type_vacaciones_legales"/>
+            <field name="request_date_from">2025-07-01</field>
+            <field name="request_date_to">2025-07-04</field>
+        </record>
+
+        <!-- Vacaciones empleado Ana Lucia Mendoza por 5 dias -->
+        <record id="vacation_ana_mendoza" model="hr.leave">
+            <field name="employee_id" ref="employee_ana_mendoza"/>
+            <field name="holiday_status_id" ref="l10n_cl_simpledigital_payroll.hr_leave_type_vacaciones_legales"/>
+            <field name="request_date_from">2025-05-01</field>
+            <field name="request_date_to">2025-05-07</field>
+        </record>
+
+        <!-- Faltas empleado Carlos Rodriguez por 2 dias -->
+        <record id="absence_carlos_rodriguez" model="hr.leave">
+            <field name="employee_id" ref="employee_carlos_rodriguez"/>
+            <field name="holiday_status_id" ref="l10n_cl_simpledigital_payroll.hr_leave_type_faltas"/>
+            <field name="request_date_from">2025-06-01</field>
+            <field name="request_date_to">2025-06-02</field>
+        </record>
+
+        <!-- Licencia Medica empleado Ana Mendoza por 5 dias -->
+        <record id="unpaid_ana_mendoza" model="hr.leave">
+            <field name="employee_id" ref="employee_ana_mendoza"/>
+            <field name="holiday_status_id" ref="l10n_cl_simpledigital_payroll.hr_leave_type_licencia_medica"/>
+            <field name="request_date_from">2025-07-01</field>
+            <field name="request_date_to">2025-07-07</field>
+        </record>
+
+    </data>
+</odoo>

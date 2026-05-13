@@ -1,0 +1,193 @@
+<odoo>
+    <!-- Vista Lista Tipos de Movimiento -->
+    <record id="view_hr_employee_movement_type_list" model="ir.ui.view">
+        <field name="name">hr.employee.movement.type.list</field>
+        <field name="model">hr.employee.movement.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="earn_type"/>
+                <field name="active" column_invisible="1" />
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Formulario Tipos de Movimiento -->
+    <record id="view_hr_employee_movement_type_form" model="ir.ui.view">
+        <field name="name">hr.employee.movement.type.form</field>
+        <field name="model">hr.employee.movement.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="earn_type"/>
+                            <field name="active" invisible="1" />
+                            <div name="options">
+                                <span class="d-inline-flex">
+                                    <field name="bono_ok"/>
+                                    <label for="bono_ok"/>
+
+                                    <field name="comision_ok"/>
+                                    <label for="comision_ok"/>
+
+                                    <field name="aguinaldo_ok"/>
+                                    <label for="aguinaldo_ok"/>
+
+                                    <field name="movilizacion_ok"/>
+                                    <label for="movilizacion_ok"/>
+
+                                    <field name="otros_descuentos_ok"/>
+                                    <label for="otros_descuentos_ok"/>
+                                </span>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="asiento_contable_debito" />
+                            <field name="asiento_contable_credito" />
+                            <field name="sequence" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="hr_event_lines" string="Eventos RRHH">
+                            <field name="hr_event_line_ids">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter reload_on_attachment="True"/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_employee_movement_type" model="ir.actions.act_window">
+        <field name="name">Tipos de Movimiento</field>
+        <field name="res_model">hr.employee.movement.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                ¡Crea tipos de movimiento personalizados!
+            </p>
+            <p>
+                Define tipos de movimiento como bonos, horas extras, vacaciones, etc.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vista Formulario Movimiento -->
+    <record id="view_hr_employee_movement_form" model="ir.ui.view">
+        <field name="name">hr.employee.movement.form</field>
+        <field name="model">hr.employee.movement</field>
+        <field name="arch" type="xml">
+            <form string="Movimientos de Empleado">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="movement_type_id" placeholder="Seleccionar Tipo de Movimiento"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="earn_type" readonly="1"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="total_amount" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Movimientos" name="movement_lines">
+                            <field name="movement_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="employee_id"/>
+                                    <field name="amount" widget="monetary" readonly="is_amount_readonly"/>
+                                    <field name="hours" placeholder="Horas" optional="hide"/>
+                                    <field name="is_amount_readonly" column_invisible="1"/>
+                                    <field name="hr_event_type_id" string="Tipo de Evento RRHH" optional="hide"/>
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter reload_on_attachment="True"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Lista Movimiento -->
+    <record id="view_hr_employee_movement_list" model="ir.ui.view">
+        <field name="name">hr.employee.movement.list</field>
+        <field name="model">hr.employee.movement</field>
+        <field name="arch" type="xml">
+            <list string="Movimientos de Empleados">
+                <field name="name"/>
+                <field name="movement_type_id"/>
+                <field name="date"/>
+                <field name="total_amount" widget="monetary" sum="total"/>
+
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda -->
+    <record id="view_hr_employee_movement_search" model="ir.ui.view">
+        <field name="name">hr.employee.movement.search</field>
+        <field name="model">hr.employee.movement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="movement_type_id"/>
+                <field name="date"/>
+                <separator/>
+                <filter name="date_quick_ranges" string="Fecha" date="date"/>
+                <filter name="today" string="Hoy" domain="[('date', '=', context_today())]"/>
+
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción principal -->
+    <record id="action_hr_employee_movement" model="ir.actions.act_window">
+        <field name="name">Movimientos de Empleados</field>
+        <field name="res_model">hr.employee.movement</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                ¡Registra movimientos de empleados!
+            </p>
+            <p>
+                Selecciona un tipo de movimiento y asigna empleados con montos personalizados.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menús -->
+    <menuitem 
+        id="menu_hr_employee_movement"
+        name="Movimientos de Empleados"
+        parent="hr_payroll.menu_hr_payroll_employees_root"
+        sequence="80"
+        action="action_hr_employee_movement"
+    />
+
+    <menuitem 
+        id="menu_hr_employee_movement_types"
+        name="Tipos de Movimiento"
+        parent="hr_payroll.menu_hr_payroll_employees_root"
+        sequence="85"
+        action="action_hr_employee_movement_type"
+    />
+</odoo>

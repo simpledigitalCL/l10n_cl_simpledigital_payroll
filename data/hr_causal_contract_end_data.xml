@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="hr_causal_contract_end_3" model="hr.causal.contract.end">
+            <field name="code">3</field>
+            <field name="name">ART. 159 N°1: MUTUO ACUERDO DE LAS PARTES</field>
+        </record>
+        <record id="hr_causal_contract_end_4" model="hr.causal.contract.end">
+            <field name="code">4</field>
+            <field name="name">ART. 159 N°2: RENUNCIA DEL TRABAJADOR</field>
+        </record>
+        <record id="hr_causal_contract_end_5" model="hr.causal.contract.end">
+            <field name="code">5</field>
+            <field name="name">ART. 159 N°3: MUERTE DEL TRABAJADOR</field>
+        </record>
+        <record id="hr_causal_contract_end_6" model="hr.causal.contract.end">
+            <field name="code">6</field>
+            <field name="name">ART. 159 N°4: VENCIMIENTO DEL PLAZO CONVENIDO</field>
+        </record>
+        <record id="hr_causal_contract_end_7" model="hr.causal.contract.end">
+            <field name="code">7</field>
+            <field name="name">ART. 159 N°5: CONCLUSIÓN DEL TRABAJO O SERVICIO</field>
+        </record>
+        <record id="hr_causal_contract_end_8" model="hr.causal.contract.end">
+            <field name="code">8</field>
+            <field name="name">ART. 159 N°6: CASO FORTUITO O FUERZA MAYOR</field>
+        </record>
+        <record id="hr_causal_contract_end_24" model="hr.causal.contract.end">
+            <field name="code">24</field>
+            <field name="name">ART. 160 N°1 LETRA A): FALTA DE PROBIDAD</field>
+        </record>
+        <record id="hr_causal_contract_end_25" model="hr.causal.contract.end">
+            <field name="code">25</field>
+            <field name="name">ART. 160 N°1 LETRA B): CONDUCTAS DE ACOSO SEXUAL</field>
+        </record>
+        <record id="hr_causal_contract_end_26" model="hr.causal.contract.end">
+            <field name="code">26</field>
+            <field name="name">ART. 160 N°1 LETRA C): VÍAS DE HECHO</field>
+        </record>
+        <record id="hr_causal_contract_end_27" model="hr.causal.contract.end">
+            <field name="code">27</field>
+            <field name="name">ART. 160 N°1 LETRA D): INJURIAS</field>
+        </record>
+        <record id="hr_causal_contract_end_28" model="hr.causal.contract.end">
+            <field name="code">28</field>
+            <field name="name">ART. 160 N°1 LETRA E): CONDUCTA INMORAL</field>
+        </record>
+        <record id="hr_causal_contract_end_29" model="hr.causal.contract.end">
+            <field name="code">29</field>
+            <field name="name">ART. 160 N°1 LETRA F): CONDUCTAS DE ACOSO LABORAL</field>
+        </record>
+        <record id="hr_causal_contract_end_11" model="hr.causal.contract.end">
+            <field name="code">11</field>
+            <field name="name">ART. 160 N°2: NEGOCIACIONES PROHIBIDAS POR ESCRITO</field>
+        </record>
+        <record id="hr_causal_contract_end_12" model="hr.causal.contract.end">
+            <field name="code">12</field>
+            <field name="name">ART. 160 N°3: NO CONCURRENCIA A LAS LABORES</field>
+        </record>
+        <record id="hr_causal_contract_end_13" model="hr.causal.contract.end">
+            <field name="code">13</field>
+            <field name="name">ART. 160 N°4: ABANDONO DEL TRABAJO</field>
+        </record>
+        <record id="hr_causal_contract_end_14" model="hr.causal.contract.end">
+            <field name="code">14</field>
+            <field name="name">ART. 160 N°5: ACTOS, OMISIONES O IMPRUDENCIAS TEMERARIAS</field>
+        </record>
+        <record id="hr_causal_contract_end_15" model="hr.causal.contract.end">
+            <field name="code">15</field>
+            <field name="name">ART. 160 N°6: PERJUICIO MATERIAL CAUSADO INTENCIONALMENTE</field>
+        </record>
+        <record id="hr_causal_contract_end_16" model="hr.causal.contract.end">
+            <field name="code">16</field>
+            <field name="name">ART. 160 N°7: INCUMPLIMIENTO GRAVE DE LAS OBLIGACIONES</field>
+        </record>
+        <record id="hr_causal_contract_end_18" model="hr.causal.contract.end">
+            <field name="code">18</field>
+            <field name="name">ART. 161 INCISO PRIMERO: NECESIDADES DE LA EMPRESA</field>
+        </record>
+        <record id="hr_causal_contract_end_19" model="hr.causal.contract.end">
+            <field name="code">19</field>
+            <field name="name">ART. 161 INCISO SEGUNDO: DESAHUCIO ESCRITO DEL EMPLEADOR</field>
+        </record>
+        <record id="hr_causal_contract_end_20" model="hr.causal.contract.end">
+            <field name="code">20</field>
+            <field name="name">ART. 163 BIS: PROCEDIMIENTO CONCURSAL DE LIQUIDACIÓN</field>
+        </record>
+    </data>
+</odoo>

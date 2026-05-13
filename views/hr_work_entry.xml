@@ -1,0 +1,18 @@
+<odoo>
+    <!-- Poner campo de horas trabajadas en el mes -->
+    <record id="view_hr_work_entry_form_inherit_hours_worked" model="ir.ui.view">
+        <field name="name">hr.work.entry.form.inherit.hours.worked</field>
+        <field name="model">hr.work.entry</field>
+        <field name="inherit_id" ref="hr_work_entry.hr_work_entry_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="before">
+                <field name="months_hours" widget="float_time"/>
+                <button name="action_generate_monthly_entries" 
+                        string="Generar Entradas del Mes" 
+                        type="object" 
+                        class="btn-primary"
+                        help="Distribuir las horas del mes en días laborales"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

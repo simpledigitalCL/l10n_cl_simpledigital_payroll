@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Comunas de la Región de Tarapacá (Código región: 01) -->
+        <record id="commune_1101" model="res.country.commune">
+            <field name="codigo">1101</field>
+            <field name="name">Iquique</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+
+        <record id="commune_1102" model="res.country.commune">
+            <field name="codigo">1102</field>
+            <field name="name">Camiña</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1104" model="res.country.commune">
+            <field name="codigo">1104</field>
+            <field name="name">Huara</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1105" model="res.country.commune">
+            <field name="codigo">1105</field>
+            <field name="name">Pica</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1106" model="res.country.commune">
+            <field name="codigo">1106</field>
+            <field name="name">Pozo Almonte</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1107" model="res.country.commune">
+            <field name="codigo">1107</field>
+            <field name="name">Alto Hospicio</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1202" model="res.country.commune">
+            <field name="codigo">1202</field>
+            <field name="name">Camarones</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1301" model="res.country.commune">
+            <field name="codigo">1301</field>
+            <field name="name">Putre</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+        
+        <record id="commune_1302" model="res.country.commune">
+            <field name="codigo">1302</field>
+            <field name="name">General Lagos</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_01')"/>
+        </record>
+
+        <!-- Comunas de la Región de Valparaiso (Código región: 05) -->
+        <record id="commune_5101" model="res.country.commune">
+            <field name="codigo">5101</field>
+            <field name="name">Valparaíso</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_05')"/>
+        </record>
+        
+        <record id="commune_5102" model="res.country.commune">
+            <field name="codigo">5102</field>
+            <field name="name">Viña del Mar</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_05')"/>
+        </record>
+
+        <!-- Comunas de la Región de Libertador General Bernardo O’Higgins (Código región: 06) -->
+        <record id="commune_6101" model="res.country.commune">
+            <field name="codigo">6101</field>
+            <field name="name">Rancagua</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_06')"/>
+        </record>
+
+        <record id="commune_6102" model="res.country.commune">
+            <field name="codigo">6102</field>
+            <field name="name">Codegua</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_06')"/>
+        </record>
+        
+
+
+    </data>
+</odoo>

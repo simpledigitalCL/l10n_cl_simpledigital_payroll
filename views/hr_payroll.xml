@@ -1,0 +1,100 @@
+<odoo>
+    <record id="action_hr_previred_txt_wizard" model="ir.actions.act_window">
+        <field name="name">Exportar TXT Previred</field>
+        <field name="res_model">hr.previred.txt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Action para Libro de Remuneraciones -->
+    <record id="action_hr_libro_remuneraciones_wizard" model="ir.actions.act_window">
+        <field name="name">Libro de Remuneraciones</field>
+        <field name="res_model">hr.libro.remuneraciones.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    
+    <!-- Submenu Previred en Reporting -->
+    <menuitem 
+        id="menu_hr_payroll_previred"
+        name="Previred"
+        parent="hr_payroll.menu_hr_payroll_report"
+        sequence="30"
+        groups="hr_payroll.group_hr_payroll_manager"        
+    />
+    
+    <!-- Submenus de Previred -->
+    <menuitem 
+        id="menu_hr_payroll_previred_txt"
+        name="Previred TXT Remuneraciones"
+        parent="menu_hr_payroll_previred"
+        sequence="10"
+        groups="hr_payroll.group_hr_payroll_manager"
+        action="l10n_cl_simpledigital_payroll.action_hr_previred_txt_wizard"
+
+    />
+
+    <!-- Menuitem para Libro de Remuneraciones -->
+    <menuitem 
+        id="menu_hr_payroll_libro_remuneraciones"
+        name="Libro de Remuneraciones"
+        parent="hr_payroll.menu_hr_payroll_report"
+        sequence="40"
+        groups="hr_payroll.group_hr_payroll_manager"
+        action="l10n_cl_simpledigital_payroll.action_hr_libro_remuneraciones_wizard"
+    />
+    
+    <!-- Submenu Previred en Configuraciones -->
+    <menuitem 
+        id="menu_hr_payroll_previred_config"
+        name="Previred"
+        parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+        sequence="110"
+        groups="hr_payroll.group_hr_payroll_manager"
+    />
+
+    <!-- Menuitem para indicadores previsionales de Previred  -->
+    <menuitem 
+        id="menu_hr_payroll_previred_indicators"
+        name="Indicadores Previsionales"
+        parent="menu_hr_payroll_previred_config"
+        sequence="10"
+        action="l10n_cl_simpledigital_payroll.action_previred_indicator"
+    />
+
+    <!-- Page para movimientos del mes de previred -->
+    <record id="view_payslip_form_previred_movements" model="ir.ui.view">
+        <field name="name">hr.payslip.form.previred.movements</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='salary_computation']" position="after">
+                <page string="Movimientos Previred">
+                    <field name="previred_movement_ids">
+                        <list editable="bottom">
+                            <field name="code"/>
+                            <field name="tipo_linea"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="employee_id" column_invisible="1" />
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Campo de horas extras en vista de nómina -->
+    <record id="view_payslip_form_overtime_hours" model="ir.ui.view">
+        <field name="name">hr.payslip.form.overtime.hours</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='struct_id']" position="after">
+                <field name="overtime_hours" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

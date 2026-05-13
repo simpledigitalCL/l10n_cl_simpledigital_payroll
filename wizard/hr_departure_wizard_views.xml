@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_departure_wizard_view_form_simpledigital" model="ir.ui.view">
+        <field name="name">hr.departure.wizard.view.form.simpledigital</field>
+        <field name="model">hr.departure.wizard</field>
+        <field name="inherit_id" ref="hr.hr_departure_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='info']/field[@name='departure_reason_id']" position="after">
+                <field name="causal_contract_end_id" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

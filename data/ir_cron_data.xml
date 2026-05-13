@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Cron job para actualizar asignaciones de vacaciones mensualmente -->
+        <record id="ir_cron_update_vacation_allocations" model="ir.cron">
+            <field name="name">Actualizar Asignaciones de Vacaciones</field>
+            <field name="model_id" ref="hr_contract.model_hr_contract"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_update_vacation_allocations()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+        </record>
+
+        <!-- Cron job para scraping de indicadores Previred mensualmente -->
+        <record id="ir_cron_scraping_previred" model="ir.cron">
+            <field name="name">Scraping Indicadores Previred</field>
+            <field name="model_id" ref="model_previred_indicator"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_scraping_previred()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+        </record>
+
+        <!-- Cron job para scraping de impuestos de 2da categoria mensualmente -->
+        <record id="ir_cron_scraping_impuesto_2da_categoria" model="ir.cron">
+            <field name="name">Scraping Impuestos 2da Categoria</field>
+            <field name="model_id" ref="model_impuesto_2da_categoria"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_scraping_impuesto_2da_categoria()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+        </record>
+
+        <!-- Cron job para actualizar los creditos de la CCAF descontar cantidar de cuotas -->
+        <record id="ir_cron_update_ccaf_credits" model="ir.cron">
+            <field name="name">Actualizar Créditos CCAF</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_update_ccaf_credits()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+        </record>
+    </data>
+</odoo>

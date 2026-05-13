@@ -1,0 +1,1939 @@
+<odoo>
+    <data noupdate="1">      
+        <record id="hr_category_empleador" model="hr.salary.rule.category">
+            <field name="name">Contribución Empleador</field>
+            <field name="code">APV_EMP</field>
+        </record>
+
+        <record id="hr_category_apvi" model="hr.salary.rule.category">
+            <field name="name">APVI del empleado</field>
+            <field name="code">APVI</field>
+        </record>
+
+        <record id="hr_category_apvc_e" model="hr.salary.rule.category">
+            <field name="name">APVC del trabajador</field>
+            <field name="code">APVC_T</field>
+        </record>
+
+        <record id="hr_no_imponible" model="hr.salary.rule.category">
+            <field name="name">No Imponible</field>
+            <field name="code">NOP_IMP</field>
+        </record>
+
+        <record id="hr_imponible" model="hr.salary.rule.category">
+            <field name="name">Imponible</field>
+            <field name="code">IMP</field>
+        </record>
+
+        <record id="hr_others" model="hr.salary.rule.category">
+            <field name="name">Otros Movimientos</field>
+            <field name="code">others</field>
+        </record>
+
+        <record id="hr_afc_empleador" model="hr.salary.rule.category">
+            <field name="name">AFC empleador</field>
+            <field name="code">AFC_EMP</field>
+        </record>
+
+        <record id="hr_afc_empleado" model="hr.salary.rule.category">
+            <field name="name">AFC Trabajador</field>
+            <field name="code">AFC_T</field>
+        </record>
+
+        <record id="hr_category_basic" model="hr.salary.rule.category">
+            <field name="name">Salario Básico</field>
+            <field name="code">BASICO</field>
+        </record>
+
+        <record id="hr_category_gross" model="hr.salary.rule.category">
+            <field name="name">Sueldo Bruto</field>
+            <field name="code">BRUTO</field>
+        </record>
+
+        <record id="hr_category_net" model="hr.salary.rule.category">
+            <field name="name">Sueldo Neto</field>
+            <field name="code">NETO</field>
+        </record>
+
+        <record id="hr_deduccion" model="hr.salary.rule.category">
+            <field name="name">Deducción</field>
+            <field name="code">DEDU</field>
+        </record>
+
+        <record id="hr_excedente" model="hr.salary.rule.category">
+            <field name="name">Excedente</field>
+            <field name="code">EXD</field>
+        </record>
+
+        <record id="hr_AFP" model="hr.salary.rule.category">
+            <field name="name">AFP</field>
+            <field name="code">AFP</field>
+        </record>
+
+        <record id="hr_AFP_Empleados" model="hr.salary.rule.category">
+            <field name="name">AFP_EMP</field>
+            <field name="code">AFP_EMP</field>
+        </record>
+
+        <record id="hr_SALUD" model="hr.salary.rule.category">
+            <field name="name">SALUD</field>
+            <field name="code">SALUD</field>
+        </record>
+
+        <record id="hr_IPS" model="hr.salary.rule.category">
+            <field name="name">IPS</field>
+            <field name="code">IPS</field>
+        </record>
+
+        <record id="hr_Haberes_no_imp" model="hr.salary.rule.category">
+            <field name="name">Haberes no imp</field>
+            <field name="code">habIMP</field>
+        </record>
+
+        <record id="hr_CCAF_Credito" model="hr.salary.rule.category">
+            <field name="name">Credito CCAF</field>
+            <field name="code">CCAF_CREDITO</field>
+        </record>
+
+        <record id="hr_apoyo_Mutual" model="hr.salary.rule.category">
+            <field name="name">Apoyo Mutual</field>
+            <field name="code">AP_MUT</field>
+        </record>
+
+        <record id="hr_apoyo_cooperativa" model="hr.salary.rule.category">
+            <field name="name">Credito cooperativa Apoyo</field>
+            <field name="code">CCAF_AHORRO</field>
+        </record>
+        
+        <record id="hr_Otros_Creditos" model="hr.salary.rule.category">
+            <field name="name">Otros Creditos</field>
+            <field name="code">CCAF_OTROS</field>
+        </record>
+
+        <record id="hr_Otros_Descuentos" model="hr.salary.rule.category">
+            <field name="name">Descuentos</field>
+            <field name="code">TOTAL_DESC</field>
+        </record>
+
+        <!-- Categoría: CCAF Descuento Dental -->
+        <record id="hr_category_ccaf_dental" model="hr.salary.rule.category">
+            <field name="name">CCAF Dental</field>
+            <field name="code">CCAF_DENTAL</field>
+        </record>
+
+        <!-- Categoría: CCAF Descuento Dental -->
+        <record id="hr_category_ccaf_seguro" model="hr.salary.rule.category">
+            <field name="name">CCAF CCAF_SEG_VIDA</field>
+            <field name="code">CCAF_SEG_VIDA</field>
+        </record>
+
+        <record id="hr_retencion" model="hr.salary.rule.category">
+            <field name="name">Retencion de Impuestos sobre la renta</field>
+            <field name="code">RETENCION</field>
+        </record>
+
+        <!-- Categoria: Subsidios -->
+        <record id="hr_category_subsidios" model="hr.salary.rule.category">
+            <field name="name">Subsidios</field>
+            <field name="code">SUBSIDIOS</field>
+        </record>
+
+        <!-- 
+            Regla Salarial de Subsidio en caso de que el empleado tenga licencia, tenga 3 o mas liquidaciones en el
+            sistema, muestra el monto que paga la institución de salud.
+        -->
+        <record id="hr_rule_subsidio" model="hr.salary.rule">
+            <field name="name">Subsidio</field>
+            <field name="code">SUBSIDIO</field>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="category_id" search="[('code','=','SUBSIDIOS')]"/>
+            <field name="sequence">2</field>
+
+            <!-- Condición: al menos 3 rentas y más de 3 días de licencia -->
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+        <![CDATA[
+# Buscar los 3 últimos payslips cerrados antes del período actual
+prev_slips = payslip.env['hr.payslip'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', 'in', ['verify','done','paid']),
+    ('date_to', '<', payslip.date_from)
+], order='date_to desc', limit=3)
+
+rentas = []
+for s in prev_slips:
+    imponible = sum(l.total for l in s.line_ids if l.category_id and l.category_id.code == 'IMP')
+    if imponible > 0:
+        rentas.append(imponible)
+
+# Días de licencia solapados
+leaves = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+])
+
+period_start = payslip.date_from
+period_end = payslip.date_to
+
+total_days = 0
+for lv in leaves:
+    lf = lv.date_from.date()
+    lt = lv.date_to.date()
+    start = lf if lf > period_start else period_start
+    end = lt if lt < period_end else period_end
+    if start <= end:
+        total_days += (end - start).days + 1
+
+# Condición: debe haber >= 3 rentas y más de 3 días de licencia
+result = len(rentas) >= 3 and total_days > 3
+            ]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+            <![CDATA[
+if len(rentas) == 3 and total_days > 3:
+    promedio_ri = sum(rentas) / 3
+    result = (promedio_ri / 90) * total_days
+else:
+    result = 0.0
+            ]]>
+            </field>
+            <field name="appears_on_payslip" eval="True"/>
+        </record>
+
+        <!-- Regla de Horas Extras -->
+        <record id="hr_rule_extra_hours" model="hr.salary.rule">
+            <field name="name">Horas Extras</field>
+            <field name="code">HE</field>
+            <field name="category_id" search="[('code','=','IMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">10</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+        <![CDATA[
+result = contract.extra_hours and contract.extra_hours > 0
+        ]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+result = 0
+if contract:
+    if contract.extra_hours and contract.extra_hours > 0:
+        if contract.hourly_wage > 0:
+            hourly_rate = contract.hourly_wage
+        elif contract.wage > 0:
+            hourly_rate = contract.wage * 0.0079545
+        else:
+            hourly_rate = 0
+
+        result = hourly_rate * contract.extra_hours
+else:
+    result = 0
+        ]]></field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+        
+        <!-- Regla Colacion -->
+        <record id="hr_rule_colocation" model="hr.salary.rule">
+            <field name="name">Colación</field>
+            <field name="category_id" search="[('code','=','NOP_IMP')]"/>
+            <field name="code">COLA</field>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">20</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+# Se aplica colación solo si existe monto en el contrato
+result = contract.colocation > 0
+        ]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+# Contador de días trabajados reales
+total_days = 0
+vac_days = 0
+asistencia_days = 0
+
+for line in payslip.worked_days_line_ids:
+    code = line.work_entry_type_id.code or ""
+    if code == "WORK100":
+        asistencia_days += line.number_of_days or 0
+    elif code == "LEAVECL120":
+        vac_days += line.number_of_days or 0
+
+total_days = asistencia_days + vac_days
+
+# Nunca más de 30
+if total_days > 30:
+    total_days = 30
+
+# Si faltan días hasta 30, completar descontando ausencias
+absent_days = sum(
+    l.number_of_days or 0
+    for l in payslip.worked_days_line_ids
+    if l.work_entry_type_id.code in ["LIC", "LEAVE90", "OUT"]
+)
+if total_days < 30:
+    total_days += (30 - (vac_days + asistencia_days + absent_days))
+
+
+result = (contract.colocation or 0.0) * total_days / 30.0
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+    
+        <!-- Regla Movilización -->
+        <record id="hr_rule_movility" model="hr.salary.rule">
+            <field name="name">Movilización</field>
+            <field name="code">MOV</field>
+            <field name="category_id" search="[('code','=','NOP_IMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">30</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">        
+<![CDATA[
+result = contract.movility and contract.movility > 0
+        ]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+# Contador de días trabajados reales
+total_days = 0
+vac_days = 0
+asistencia_days = 0
+
+for line in payslip.worked_days_line_ids:
+    code = line.work_entry_type_id.code or ""
+    if code == "WORK100":
+        asistencia_days += line.number_of_days or 0
+    elif code == "LEAVECL120":
+        vac_days += line.number_of_days or 0
+total_days = asistencia_days + vac_days
+
+# Nunca más de 30
+if total_days > 30:
+    total_days = 30
+
+# Si faltan días hasta 30, completar descontando ausencias
+absent_days = sum(
+    l.number_of_days or 0
+    for l in payslip.worked_days_line_ids
+    if l.work_entry_type_id.code in ["LIC", "LEAVE90", "OUT"]
+)
+if total_days < 30:
+    total_days += (30 - (vac_days + asistencia_days + absent_days))
+
+
+result = (contract.movility or 0.0) * total_days / 30.0
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>  
+        
+        <!-- Gratificacion 47 -->
+        <record id="hr_rule_gratification_47" model="hr.salary.rule">
+            <field name="name">Gratificación Legal (Art. 47)</field>
+            <field name="code">GRAT47</field>
+            <field name="category_id" search="[('code','=','IMP')]" />
+            <field name="struct_id" search="[('name','=','Nómina Chile')]" />
+            <field name="sequence">40</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python"># Solo calcular si la empresa tiene habilitada gratificación y eligió Art. 47 y la fecha es la correcta
+<![CDATA[
+result = (
+    contract and
+    contract.company_id.gratification_enabled and
+    contract.company_id.gratification_type == '47' and
+    payslip.date_to >= contract.company_id.gratification_payment_date
+)]]>           
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># Parámetros de gratificación
+gratification_percentage = contract.company_id.gratification_percentage / 100.0
+utilidad_liquida = contract.company_id.annual_net_profit or 0.0
+# Contar empleados activos de la empresa que tienen gratificación habilitada
+num_empleados = len(employee.search([('company_id','=',contract.company_id.id), ('active','=',True), ('contract_ids.has_gratification','=',True)]))
+if num_empleados == 0:
+    result = 0.0
+else:
+    gratif_teorica = (utilidad_liquida * gratification_percentage) / num_empleados
+    # Aplica tope IMM * 4.75 desde indicador Previred
+    previred_indicator = payslip.env['previred.indicator'].search([
+        ('date', '&lt;=', payslip.date_from)
+    ], order='date desc', limit=1)
+    
+    if previred_indicator and previred_indicator.trab_dependiente_independiente:
+        imm = previred_indicator.trab_dependiente_independiente
+        tope = imm * 4.75
+        result = min(gratif_teorica, tope)
+    else:
+        result = gratif_teorica</field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+        
+        <!-- Gratificacion 50 -->
+        <record id="hr_rule_gratification_50" model="hr.salary.rule">
+            <field name="name">Gratificación Legal (Art. 50)</field>
+            <field name="code">GRAT50</field>
+            <field name="category_id" search="[('code','=','IMP')]" />
+            <field name="struct_id" search="[('name','=','Nómina Chile')]" />
+            <field name="sequence">50</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = (
+    contract and
+    contract.company_id.gratification_enabled and
+    contract.company_id.gratification_type == '50' and
+    contract.has_gratification
+)
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># Art. 50: 25% fijo sobre remuneraciones imponibles
+<![CDATA[
+# Gratificación Art. 50: 25% del imponible del mes,
+# tope: 4.75 * IMM / 12, prorrateado por días WORK100.
+
+result = 0.0
+
+if contract and contract.has_gratification:
+    # 1) Base imponible del mes (sin incluir esta misma regla)
+    base_imponible = categories.get('IMP', 0.0)
+    if not base_imponible:
+        base_imponible = categories.get('GROSS', 0.0)
+
+    # 2) Días trabajados para prorrateo del tope (WORK100 + LEAVECL120)
+    wd_work = worked_days.get('WORK100')
+    wd_vacation = worked_days.get('LEAVECL120')
+    
+    dias_trabajo = wd_work.number_of_days if wd_work else 0.0
+    dias_vacaciones = wd_vacation.number_of_days if wd_vacation else 0.0
+    
+    dias = dias_trabajo + dias_vacaciones
+    
+    if dias < 0.0:
+        dias = 0.0
+    if dias > 30.0:
+        dias = 30.0
+    proporcion = dias / 30.0
+
+    # 3) Gratificación teórica (25%)
+    gratif = base_imponible * 0.25
+
+    # 4) Rango del mes (sin imports)
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    start = payslip.date_from.replace(day=1)
+    if month == 12:
+        end = payslip.date_from.replace(year=year + 1, month=1, day=1)
+    else:
+        end = payslip.date_from.replace(month=month + 1, day=1)
+
+    indicator = payslip.env['previred.indicator'].sudo().search([
+        ('date', '>=', start),
+        ('date', '<', end),
+    ], order='date desc', limit=1)
+
+    # 5) IMM: probar campos posibles sin usar getattr/hasattr
+    imm = 0.0
+    if indicator:
+        try:
+            imm = float(indicator.ingreso_minimo_mensual or 0.0)
+        except:
+            try:
+                imm = float(indicator.sueldo_minimo or 0.0)
+            except:
+                try:
+                    imm = float(indicator.ingreso_minimo or 0.0)
+                except:
+                    try:
+                        imm = float(indicator.trab_dependiente_independiente or 0.0)
+                    except:
+                        imm = 0.0
+
+    # 6) Tope mensual prorrateado
+    tope = 0.0
+    if imm:
+        tope = (imm * 4.75 / 12.0) * proporcion
+
+    # 7) Resultado con tope
+    if tope == 0.0 or gratif <= tope:
+        result = gratif
+    else:
+        result = tope
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla Salarial Viaticos Fijos -->
+        <record id="hr_rule_viatico_fijo" model="hr.salary.rule">
+            <field name="name">Viático fijo</field>
+            <field name="code">VIATICO_FIJO</field>
+            <field name="category_id" search="[('code','=','NOP_IMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">101</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+                <![CDATA[
+result = contract.viatico_fijo and contract.viatico_fijo > 0
+                ]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+                <![CDATA[
+result = contract.viatico_fijo or 0.0
+                ]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!--Haberes No Imponibles -->
+        <record id="hr_Haberes_no_imponibles" model="hr.salary.rule">
+            <field name="name">Haberes no imp</field>
+            <field name="code">habIMP</field>
+            <field name="category_id" search="[('code','=','habIMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">151</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = categories.get('NOP_IMP', 0.0) > 0]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = categories.get('NOP_IMP', 0.0)
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!--Regla de AFP-->
+        <record id="hr_rule_afp" model="hr.salary.rule">
+            <field name="name">AFP</field>
+            <field name="code">AFP</field>
+            <field name="category_id" search="[('code','=','AFP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">152</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = (
+    contract.pension_option == 'afp'
+    and contract.afp_option not in ['00 - 100'] and not contract.is_retired_elderly
+)]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">        
+<![CDATA[
+# Mapeo de códigos AFP a nombres completos
+afp_names = {
+    '00 - 100': 'No AFP',
+    '33 - 31': 'Capital AFP',
+    '03 - 13': 'Cuprum AFP',
+    '05 - 14': 'Habitat AFP',
+    '29 - 11': 'PlanVital AFP',
+    '08 - 6': 'ProVida AFP',
+    '34 - 103': 'Modelo AFP',
+    '35 - 19': 'Uno AFP'
+}
+
+# Obtener el nombre de la AFP
+afp_name = afp_names.get(contract.afp_option, 'AFP')
+
+# Año y mes de la nómina
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+# Buscar indicadores previred del mes
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+# Mapeo de tasas
+afp_rate_map = {
+    '00 - 100': 0.0,
+    '33 - 31': indicator.capital_tasa_dependiente,
+    '03 - 13': indicator.cuprum_tasa_dependiente,
+    '05 - 14': indicator.habitat_tasa_dependiente,
+    '29 - 11': indicator.planvital_tasa_dependiente,
+    '08 - 6': indicator.provida_tasa_dependiente,
+    '34 - 103': indicator.modelo_tasa_dependiente,
+    '35 - 19': indicator.uno_tasa_dependiente,
+}
+
+# Calcular monto AFP
+tasa_afp = afp_rate_map.get(contract.afp_option, 0.0)
+base_imponible = min(categories.get('GROSS', 0.0), indicator.tope_afiliados_afp)
+result = base_imponible * tasa_afp / 100.0 if tasa_afp else 0.0
+
+# Asignar el nombre personalizado al resultado para nómina y asiento
+result_name = afp_name
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!--Regla de AFP_Empleador 1%-->
+        <record id="hr_AFP_Em" model="hr.salary.rule">
+            <field name="name">AFP_Empleador</field>
+            <field name="code">AFP_EMP</field>
+            <field name="category_id" search="[('code','=','AFP_EMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">153</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = (
+    contract.pension_option == 'afp'
+    and contract.afp_option not in ['00 - 100'] and not contract.is_retired_elderly
+)]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">        
+<![CDATA[
+# Mapeo de códigos AFP a nombres completos
+afp_names = {
+    '00 - 100': 'No AFP',
+    '33 - 31': 'Capital AFP',
+    '03 - 13': 'Cuprum AFP',
+    '05 - 14': 'Habitat AFP',
+    '29 - 11': 'PlanVital AFP',
+    '08 - 6': 'ProVida AFP',
+    '34 - 103': 'Modelo AFP',
+    '35 - 19': 'Uno AFP'
+}
+
+# Nombre de la AFP según contrato
+afp_name = afp_names.get(contract.afp_option, 'AFP')
+
+result = 0.0
+
+if contract.pension_option in ['afp', 'inp']:
+    # Fechas de la nómina
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    first_day = payslip.date_from.replace(day=1)
+
+    if month < 12:
+        next_month = payslip.date_from.replace(month=month + 1, day=1)
+    else:
+        next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+    # Buscar indicador Previred del mes
+    indicator = payslip.env['previred.indicator'].sudo().search([
+        ('date', '>=', first_day),
+        ('date', '<', next_month)
+    ], order='date desc', limit=1)
+
+    # Usar la tasa cargo empleador
+    tasa_cargo_empleador = indicator.cargo_empleador if indicator else 0.0
+
+    # Calcular base imponible con tope AFP
+    tope = indicator.tope_afiliados_afp if indicator else 0.0
+    base_imponible = min(categories.get('GROSS', 0.0), tope)
+
+    # Calcular monto AFP solo con cargo_empleador
+    result = (base_imponible * tasa_cargo_empleador) / 100.0 if tasa_cargo_empleador > 0 else 0.0
+
+# Asignar nombre personalizado en recibo
+result_name = afp_name
+]]>
+
+
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!--Salud -->
+        <record id="hr_rule_salud" model="hr.salary.rule">
+            <field name="name">Salud (FONASA / ISAPRE)</field>
+            <field name="code">SALUD</field>
+            <field name="category_id" search="[('code','=','SALUD')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">154</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = bool(contract.health_institution and contract.health_institution not in ['00 - 99'])
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+# Mapeo de códigos de salud a nombres
+health_names = {
+    '00 - 99': 'Sin Isapre',
+    '01 - 3': 'Banmédica',
+    '02 - 9': 'Consalud',
+    '03 - 12': 'Vida Tres',
+    '04 - 4': 'Colmena',
+    '05 - 1': 'Cruz Blanca',
+    '07 - 102': 'Fonasa',
+    '10 - 43': 'Nueva Masvida',
+    '11 - 5': 'Isapre de Codelco',
+    '12 - 40': 'Isapre Banco Estado',
+    '25 - 38': 'Cruz del Norte'
+}
+
+# Obtener el nombre específico
+health_name = health_names.get(contract.health_institution, 'Salud')
+
+result_name = health_name
+
+# Actualizar el nombre en la línea de la nómina (igual que en AFP)
+payslip.line_ids.filtered(lambda l: l.salary_rule_id.code == 'SALUD').write({'name': result_name})
+                
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+base_imponible = categories.get('GROSS', 0.0)
+tope_afiliados_afp = 0.0
+
+if indicator:
+    try:
+        tope_afiliados_afp = indicator.tope_afiliados_afp
+    except AttributeError:
+        tope_afiliados_afp = 0.0
+
+if tope_afiliados_afp > 0:
+    base_imponible = min(base_imponible, tope_afiliados_afp)
+
+if contract.health_institution == '00 - 99':
+    result = 0.0
+else:
+    result = base_imponible * 0.07]]>
+
+        </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <record id="hr_rule_pago_acordado_isapre" model="hr.salary.rule">
+            <field name="name">Pago Acordado ISAPRE</field>
+            <field name="code">ISAPRE_EXTRA</field>
+            <field name="category_id" search="[('code','=','EXD')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">155</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+# Primero verificar condiciones básicas
+basic_condition = bool(
+    contract and
+    contract.health_institution and 
+    contract.health_institution not in ['00 - 99', '07 - 102'] and
+    contract.isapre_calc_type in ['clp', 'uf']
+)
+
+result = False
+
+if basic_condition:
+    # Calcular el monto (misma lógica que amount_python_compute)
+    cotizacion_legal_7 = categories.get('SALUD', 0.0)
+    
+    # Obtener indicador Previred
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    first_day = payslip.date_from.replace(day=1)
+    if month < 12:
+        next_month = payslip.date_from.replace(month=month + 1, day=1)
+    else:
+        next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+    indicator = payslip.env['previred.indicator'].sudo().search([
+        ('date', '>=', first_day),
+        ('date', '<', next_month)
+    ], order='date desc', limit=1)
+
+    if indicator:
+        if contract.isapre_calc_type == 'uf' and contract.isapre_uf_valor and indicator.uf_value_on_month:
+            valor_plan_pactado = contract.isapre_uf_valor * indicator.uf_value_on_month
+        elif contract.isapre_calc_type == 'clp' and contract.isapre_plan_monto:
+            valor_plan_pactado = contract.isapre_plan_monto
+        else:
+            valor_plan_pactado = 0.0
+
+        adicional = valor_plan_pactado - cotizacion_legal_7
+        result = adicional > 0  
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+    <![CDATA[
+result = 0.0
+
+if contract:
+    health_institution = contract.health_institution or ''
+    if health_institution not in ['07 - 102', '00 - 99']:
+
+        # Obtener cotización legal 7% desde categories['SALUD']
+        cotizacion_legal_7 = categories.get('SALUD', 0.0)
+
+        # Obtener indicador Previred más reciente
+        year = payslip.date_from.year
+        month = payslip.date_from.month
+        first_day = payslip.date_from.replace(day=1)
+        if month < 12:
+            next_month = payslip.date_from.replace(month=month + 1, day=1)
+        else:
+            next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+        indicator = payslip.env['previred.indicator'].sudo().search([
+            ('date', '>=', first_day),
+            ('date', '<', next_month)
+        ], order='date desc', limit=1)
+        
+        total_days = 0
+        vac_days = 0
+        asistencia_days = 0
+        for line in payslip.worked_days_line_ids:
+            code = line.work_entry_type_id.code or ""
+            if code == "WORK100":
+                asistencia_days += line.number_of_days or 0
+            elif code == "LEAVECL120":
+                vac_days += line.number_of_days or 0
+        total_days = asistencia_days + vac_days
+
+        if indicator:
+            calc_type = contract.isapre_calc_type or ''
+            valor_plan_pactado = 0.0
+
+            if calc_type == 'uf':
+                if contract.isapre_uf_valor and indicator.uf_value_on_month:
+                    valor_plan_pactado = contract.isapre_uf_valor * indicator.uf_value_on_month
+
+            elif calc_type == 'clp':
+                if contract.isapre_plan_monto:
+                    valor_plan_pactado = contract.isapre_plan_monto
+
+            if total_days < 30:
+                result = (valor_plan_pactado/30) * total_days - cotizacion_legal_7
+            else:    
+                # Calcular adicional si la cotización legal no cubre el plan pactado
+                adicional = valor_plan_pactado - cotizacion_legal_7
+                result = adicional if adicional > 0 else 0.0
+    else:
+        result = 0.0
+else:
+    result = 0.0
+    ]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!--Regla de IPS-->
+        <record id="hr_rule_ips" model="hr.salary.rule">
+            <field name="name">IPS</field>
+            <field name="code">IPS</field>
+            <field name="category_id" search="[('code','=','IPS')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">156</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.pension_option == 'inp'</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+# Tasa fija de cotización para IPS (10%)
+tasa_ips = 10.0  # 10% del sueldo imponible (sin comisión ni SIS)
+
+# Calcular la base imponible (usar el tope de IPS si BRUTO lo supera)
+base_imponible = min(categories.get('GROSS', 0.0), indicator.tope_afiliados_ips)
+
+# Calcular el resultado (la tasa ya está en porcentaje)
+result = base_imponible * tasa_ips / 100.0]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- AFC TRABAJADOR -->
+        <record id="hr_rule_afc_employee" model="hr.salary.rule">
+            <field name="name">AFC Trabajador</field>
+            <field name="code">AFC_T</field>
+            <field name="category_id" search="[('code','=','AFC_T')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">157</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+valid_codes = ['Permanent', 'Full-Time', 'Part-Time', 'Employee', 'Statutory','Contrato Indefinido']
+contract_code = contract.contract_type_id.code if contract.contract_type_id else ""
+result = contract.afc_enrolled_trabajador and contract_code in valid_codes
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+# Validar existencia del indicador
+if not indicator:
+    result = 0.0
+else:
+    # Calcular la base imponible (usar el tope si BRUTO lo supera)
+    base_imponible = min(categories.get('GROSS', 0.0), indicator.tope_seguro_cesantia)
+    
+    # Aplicar tasa de AFC Empleado
+    tasa = indicator.plazo_indefinido_trabajador or 0.0
+    result = base_imponible * (tasa / 100.0)]]>
+            </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla de APVI -->
+        <record id="hr_rule_apvi" model="hr.salary.rule">
+            <field name="name">APVI</field>
+            <field name="code">APVI</field>
+            <!-- Categoría NETO o crea una categoría personalizada si lo prefieres -->
+            <field name="category_id" search="[('code','=','APVI')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">158</field>
+            
+            <!-- Condición: solo si tiene APVI y el monto es mayor que 0 -->
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.has_apvi and contract.cotizacion_apvi and contract.cotizacion_apvi > 0</field>
+        
+            <!-- Monto a descontar: lo que definiste en el contrato -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+if not indicator or not contract.cotizacion_apvi:
+    result = 0.0
+else:
+    result = min(contract.cotizacion_apvi, indicator.tope_mensual_apv)]]>
+            </field>
+        
+            <!-- Mostrar en el recibo de sueldo -->
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla de APVC Trabajador -->
+        <record id="hr_rule_apvc_trabajador" model="hr.salary.rule">
+            <field name="name">APVC Trabajador</field>
+            <field name="code">APVC_T</field>
+            <field name="category_id" search="[('code','=','APVC_T')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">159</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.has_apvc and contract.cotizacion_apvc_trabajador and contract.cotizacion_apvc_trabajador > 0</field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+if not indicator or not contract.cotizacion_apvc_trabajador:
+    result = 0.0
+else:
+    result = min(contract.cotizacion_apvc_trabajador, indicator.tope_mensual_apv)]]>
+            </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla de APVC Empleador -->
+        <record id="hr_rule_apvc_empleador" model="hr.salary.rule">
+            <field name="name">APVC Empleador</field>
+            <field name="code">APVC_E</field>
+            <field name="category_id" search="[('code','=','APV_EMP')]"/> <!-- Usa EMP o crea una categoría personalizada -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">160</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.has_apvc and contract.cotizacion_apvc_empleador and contract.cotizacion_apvc_empleador > 0</field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+if not indicator or not contract.cotizacion_apvc_empleador:
+    result = 0.0
+else:
+    result = min(contract.cotizacion_apvc_empleador, indicator.tope_mensual_apv)]]>
+            </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <record id="hr_rule_impuesto_retenido" model="hr.salary.rule">
+            <field name="name">Impuesto Retenido (2da Categoría)</field>
+            <field name="code">IMP_RETENIDO</field>
+            <field name="category_id" search="[('code','=','RETENCION')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">161</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+# Paso 1: Haberes Imponibles
+total_imponible = categories.get('GROSS', 0.0)
+
+# Paso 2: Deducciones obligatorias
+afp = categories.get('AFP', 0.0)
+salud = categories.get('SALUD', 0.0)
+afc = categories.get('AFC_T')
+apvi = categories.get('APVI')
+apvc_t = categories.get('APVC_T')
+apvc_e = categories.get('APV_EMP')
+
+# Total cotizaciones
+total_cotizaciones = afp + salud + afc + apvi + apvc_t + apvc_e
+
+# Renta afecta
+renta_afecta = total_imponible - total_cotizaciones
+
+monto = 0.0
+if renta_afecta > 0:
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    start = payslip.date_from.replace(day=1)
+    end = payslip.date_from.replace(month=month + 1, day=1) if month < 12 else payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+    impuesto = payslip.env['impuesto_2da_categoria'].sudo().search([
+        ('date', '>=', start),
+        ('date', '<', end)
+    ], order='date desc', limit=1)
+
+    if impuesto:
+        if renta_afecta <= impuesto.first_line_to:
+            monto = 0.0
+        elif renta_afecta <= impuesto.second_line_to:
+            monto = (renta_afecta * impuesto.second_line_factor) - impuesto.second_line_tasa_rebaja
+        elif renta_afecta <= impuesto.third_line_to:
+            monto = (renta_afecta * impuesto.third_line_factor) - impuesto.third_line_tasa_rebaja
+        elif renta_afecta <= impuesto.fourth_line_to:
+            monto = (renta_afecta * impuesto.fourth_line_factor) - impuesto.fourth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.fifth_line_to:
+            monto = (renta_afecta * impuesto.fifth_line_factor) - impuesto.fifth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.sixth_line_to:
+            monto = (renta_afecta * impuesto.sixth_line_factor) - impuesto.sixth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.seventh_line_to:
+            monto = (renta_afecta * impuesto.seventh_line_factor) - impuesto.seventh_line_tasa_rebaja
+        elif renta_afecta >= impuesto.eighth_line_from:
+            monto = (renta_afecta * impuesto.eighth_line_factor) - impuesto.eighth_line_tasa_rebaja
+
+# Solo se ejecuta si el monto es mayor que 0
+result = monto > 0
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+# Paso 1: Haberes Imponibles
+total_imponible = categories.get('GROSS', 0.0)
+
+# Paso 2: Función para obtener monto de una regla previa
+def get_monto(code):
+    for line in payslip.line_ids:
+        if line.code == code:
+            return line.total
+    return 0.0
+
+# Deducciones obligatorias
+afp = categories.get('AFP', 0.0)
+salud = categories.get('SALUD', 0.0)
+afc = categories.get('AFC_T')
+apvi = categories.get('APVI')
+apvc_t = categories.get('APVC_T')
+apvc_e = categories.get('APV_EMP')
+
+# Total cotizaciones
+total_cotizaciones = afp + salud + afc + apvi + apvc_t + apvc_e
+
+# Renta afecta
+renta_afecta = total_imponible - total_cotizaciones
+
+
+if renta_afecta <= 0:
+    result = 0.0
+else:
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    start = payslip.date_from.replace(day=1)
+    end = payslip.date_from.replace(month=month + 1, day=1) if month < 12 else payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+    impuesto = payslip.env['impuesto_2da_categoria'].sudo().search([
+        ('date', '>=', start),
+        ('date', '<', end)
+    ], order='date desc', limit=1)
+
+    if not impuesto:
+        result = 0.0
+    else:
+        factor = 0.0
+        rebaja = 0.0
+
+        if renta_afecta <= impuesto.first_line_to:
+            result = 0.0
+        elif renta_afecta <= impuesto.second_line_to:
+            factor = impuesto.second_line_factor
+            rebaja = impuesto.second_line_tasa_rebaja
+        elif renta_afecta <= impuesto.third_line_to:
+            factor = impuesto.third_line_factor
+            rebaja = impuesto.third_line_tasa_rebaja
+        elif renta_afecta <= impuesto.fourth_line_to:
+            factor = impuesto.fourth_line_factor
+            rebaja = impuesto.fourth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.fifth_line_to:
+            factor = impuesto.fifth_line_factor
+            rebaja = impuesto.fifth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.sixth_line_to:
+            factor = impuesto.sixth_line_factor
+            rebaja = impuesto.sixth_line_tasa_rebaja
+        elif renta_afecta <= impuesto.seventh_line_to:
+            factor = impuesto.seventh_line_factor
+            rebaja = impuesto.seventh_line_tasa_rebaja
+        elif renta_afecta >= impuesto.eighth_line_from:
+            factor = impuesto.eighth_line_factor
+            rebaja = impuesto.eighth_line_tasa_rebaja
+
+        result = max(0.0, (renta_afecta * factor) - rebaja)
+        result = round(result, 0)
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla: Crédito Social CCAF -->
+        <record id="hr_rule_ccaf_credit" model="hr.salary.rule">
+            <field name="name">Crédito Social CCAF</field>
+            <field name="code">CCAF_CREDITO</field>
+            <field name="category_id" search="[('code','=','CCAF_CREDITO')]"/> <!-- Puedes crear esta categoría si no existe -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">162</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = False
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'credit'),
+        ('active', '=', True),
+        ('start_date', '<=', payslip.date_to),
+        ('remaining_installments', '>', 0),
+    ])
+    total = sum(d.installment_amount for d in deductions)
+    result = total > 0
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = 0
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'credit'),
+        ('active', '=', True),
+        ('start_date', '<=', payslip.date_to),
+        ('remaining_installments', '>', 0),
+        ])
+    result = sum(d.installment_amount for d in deductions)]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla: Crédito Cooperativas de Ahorro (CCAF Leasing) -->
+        <record id="hr_rule_ccaf_saving" model="hr.salary.rule">
+            <field name="name">Programa Ahorro (lea</field>
+            <field name="code">CCAF_AHORRO</field>
+            <field name="category_id" search="[('code','=','CCAF_AHORRO')]"/> <!-- Crea esta categoría si no existe -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">163</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = False
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'leasing'),
+        ('active', '=', True),
+    ])
+    total = sum(d.total_amount for d in deductions)
+    result = total > 0
+]]>
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = 0
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'leasing'),
+        ('active', '=', True),
+    ])
+    result = sum(d.total_amount for d in deductions)
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla: Descuento Dental (CCAF) -->
+        <record id="hr_rule_ccaf_dental" model="hr.salary.rule">
+            <field name="name">Descuento Dental</field>
+            <field name="code">CCAF_DENTAL</field>
+            <field name="category_id" search="[('code','=','CCAF_DENTAL')]"/> <!-- Crea esta categoría si no existe -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">164</field>
+        
+            <!-- Condición en Python -->
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = False
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'dental'),
+        ('active', '=', True),
+    ])
+    total = sum(d.total_amount for d in deductions)
+    result = total > 0
+]]>
+            </field>
+        
+            <!-- Monto en Python -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = 0
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'dental'),
+        ('active', '=', True),
+    ])
+    result = sum(d.total_amount for d in deductions)
+]]>
+            </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla: Descuento Dental (CCAF) -->
+        <record id="hr_rule_ccaf_seguro" model="hr.salary.rule">
+            <field name="name">Descuento de vida</field>
+            <field name="code">CCAF_SEG_VIDA</field>
+            <field name="category_id" search="[('code','=','CCAF_SEG_VIDA')]"/> <!-- Crea esta categoría si no existe -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">165</field>
+        
+            <!-- Condición en Python -->
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = False
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'insurance'),
+        ('active', '=', True),
+    ])
+    total = sum(d.total_amount for d in deductions)
+    result = total > 0
+]]>
+            </field>
+        
+            <!-- Monto en Python -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = 0
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'insurance'),
+        ('active', '=', True),
+    ])
+    result = sum(d.total_amount for d in deductions)
+]]>
+            </field>
+        
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla: Otros Créditos CCAF -->
+        <record id="hr_rule_ccaf_otros_creditos" model="hr.salary.rule">
+            <field name="name">Otros Créditos CCAF</field>
+            <field name="code">CCAF_OTROS</field>
+            <field name="category_id" search="[('code','=','CCAF_OTROS')]"/> <!-- Asegúrate que esta categoría existe -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">166</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = False
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'other'),
+        ('active', '=', True),
+        ('start_date', '<=', payslip.date_to),
+    ])
+    result = any(d.total_amount > 0 for d in deductions)
+]]>
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+employee = payslip.employee_id
+if not employee:
+    result = 0
+else:
+    deductions = payslip.env['hr.ccaf.deduction'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('deduction_type', '=', 'other'),
+        ('active', '=', True),
+        ('start_date', '<=', payslip.date_to),
+    ])
+    result = int(round(sum(d.total_amount for d in deductions)))
+        ]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla AFC Empleador -->
+        <record id="hr_rule_afc_employer" model="hr.salary.rule">
+            <field name="name">AFC Empleador</field>
+            <field name="code">AFC_EMPLEADOR</field>
+            <field name="category_id" search="[('code','=','AFC_EMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">167</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.afc_enrolled and contract.contract_type_id
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+contract_code = contract.contract_type_id.code if contract.contract_type_id else ''
+start_date = contract.date_start
+today = payslip.date_to
+seniority_years = 0.0
+
+if start_date:
+    seniority_days = (today - start_date).days
+    seniority_years = seniority_days / 365.0
+base_imponible = min(categories.get('GROSS', 0.0), indicator.tope_seguro_cesantia)
+
+# Si tiene licencias, faltas o vacaciones
+leaves_any = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|', '|', '|', '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+    ('holiday_status_id.name', 'ilike', 'vacac'),      # vacaciones
+    ('holiday_status_id.name', 'ilike', 'falta'),      # faltas
+    ('holiday_status_id.name', 'ilike', 'ausenc'),     # ausencias
+])
+
+# Solo licencias médicas (para total_days)
+leaves_med = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+])
+
+period_start = payslip.date_from
+period_end = payslip.date_to
+
+total_days = 0
+for lv in leaves_med:
+    lf = lv.date_from.date()
+    lt = lv.date_to.date()
+    start = lf if lf > period_start else period_start
+    end = lt if lt < period_end else period_end
+    if start <= end:
+        total_days += (end - start).days + 1
+
+has_leave = bool(leaves_med)
+
+# Definir tasa de AFC
+if contract_code in ['Permanent', 'Full-Time', 'Part-Time', 'Employee', 'Statutory','Contrato Indefinido']:
+    if seniority_years >= 11:
+        tasa = indicator.plazo_indefinido_empleador_more_11 or 0.0
+    else:
+        tasa = indicator.plazo_indefinido_empleador or 0.0
+elif contract_code in ['Temporary', 'Seasonal', 'Student', 'Apprenticeship', 'Thesis','Contrato Plazo Fijo']:
+    tasa = indicator.plazo_fijo_empleador or 0.0
+else:
+    tasa = 0.0
+
+if not indicator:
+    result = 0.0
+
+elif not has_leave:
+    result = base_imponible * (tasa / 100.0)
+
+elif has_leave:
+    # Buscar la liquidación anterior SIN licencias superpuestas.
+    prev_slips = payslip.env['hr.payslip'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('state', 'in', ['verify','done','paid']),
+        ('date_to', '<', payslip.date_from)
+    ], order='date_to desc', limit=12)
+    renta_imponible = 0.0
+
+    for ps in prev_slips:
+        ps_leaves = payslip.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', ps.date_to),
+            ('date_to', '>=', ps.date_from),
+            '|',
+            ('holiday_status_id.name', 'ilike', 'enfermedad'),
+            ('holiday_status_id.name', 'ilike', 'médica'),
+        ], limit=1)
+        if ps_leaves:
+            continue 
+
+        lines = ps.line_ids.sudo()
+        # Sumar por categoría
+        total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code in ('IMPO', 'IMPONIBLE'))
+        if not total_impo:
+            total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code == 'GROSS')
+        renta_imponible = float(total_impo or 0.0)
+        break
+    valor_afc_licencia = ((min(renta_imponible, indicator.tope_seguro_cesantia) / 30) * total_days) * (tasa/100)
+    valor_afc =  base_imponible * (tasa / 100.0)
+    result = valor_afc_licencia + valor_afc
+else:
+    result = 0.0
+
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla de Aporte Empleador Seguro Accidentes del Trabajo y Ley SANNA -->
+        <record id="hr_rule_aporte_mutual" model="hr.salary.rule">
+            <field name="name">Aporte Empleador Seguro Accidentes</field>
+            <field name="code">APORTE_MUTUAL</field>
+            <field name="category_id" search="[('code','=','AP_MUT')]"/> 
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">168</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = contract.company_id and contract.company_id.has_mutual]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+        
+# Obtener tasas
+company = contract.company_id
+tasa_base = company.rate_base or 0.0
+tasa_adicional = company.rate_additional or 0.0
+tasa_total = tasa_base + tasa_adicional
+
+# Si tiene licencias, faltas o vacaciones
+leaves_any = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|', '|', '|', '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+    ('holiday_status_id.name', 'ilike', 'vacac'),      # vacaciones
+    ('holiday_status_id.name', 'ilike', 'falta'),      # faltas
+    ('holiday_status_id.name', 'ilike', 'ausenc'),     # ausencias
+])
+
+# Solo licencias médicas (para total_days)
+leaves_med = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+])
+
+period_start = payslip.date_from
+period_end = payslip.date_to
+
+total_days = 0
+for lv in leaves_med:
+    lf = lv.date_from.date()
+    lt = lv.date_to.date()
+    start = lf if lf > period_start else period_start
+    end = lt if lt < period_end else period_end
+    if start <= end:
+        total_days += (end - start).days + 1
+
+has_leave = bool(leaves_med)
+
+# Sueldo imponible (puedes ajustar si usas otra fuente)
+sueldo_imponible = categories.get('GROSS', 0.0)
+        
+# Aplicar tope si existe
+if indicator and indicator.tope_afiliados_afp > 0:
+    sueldo_imponible = min(sueldo_imponible, indicator.tope_afiliados_afp)
+
+if not has_leave:
+    result = sueldo_imponible * (tasa_total / 100.0)
+
+else:
+    # Buscar la liquidación anterior SIN licencias superpuestas.
+    prev_slips = payslip.env['hr.payslip'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('state', 'in', ['verify','done','paid']),
+        ('date_to', '<', payslip.date_from)
+    ], order='date_to desc', limit=12)
+    renta_imponible = 0.0
+
+    for ps in prev_slips:
+        ps_leaves = payslip.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', ps.date_to),
+            ('date_to', '>=', ps.date_from),
+            '|',
+            ('holiday_status_id.name', 'ilike', 'enfermedad'),
+            ('holiday_status_id.name', 'ilike', 'médica'),
+        ], limit=1)
+        if ps_leaves:
+            continue 
+
+        lines = ps.line_ids.sudo()
+        # Sumar por categoría
+        total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code in ('IMPO', 'IMPONIBLE'))
+        if not total_impo:
+            total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code == 'GROSS')
+        renta_imponible = float(total_impo or 0.0)
+        break
+
+    # licencia parcial
+    if total_days < 30:
+        valor_sanna_licencia = ((min(renta_imponible, indicator.tope_afiliados_afp) / 30) * total_days) * 0.0003
+        valor_senna = sueldo_imponible * (tasa_total / 100.0)
+        result = valor_sanna_licencia + valor_senna
+    # licencia completa
+    else:
+        result = renta_imponible * 0.0003
+
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla SIS -->
+        <record id="hr_rule_sis" model="hr.salary.rule">
+            <field name="name">SIS</field>
+            <field name="code">SIS</field>
+            <field name="category_id" search="[('code','=','DEDU')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">169</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = (
+    contract.pension_option == 'afp'
+    and contract.afp_option not in ['00 - 100'] and not contract.is_retired_elderly
+)]]>
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+result = 0.0
+
+# Buscar el indicador del mes correspondiente
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+tope = indicator.tope_afiliados_afp if indicator else 0.0
+tasa_sis = indicator.tasa_sis if indicator else 0.0
+
+# Si tiene licencias, faltas o vacaciones
+leaves_any = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|', '|', '|', '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+    ('holiday_status_id.name', 'ilike', 'vacac'),      # vacaciones
+    ('holiday_status_id.name', 'ilike', 'falta'),      # faltas
+    ('holiday_status_id.name', 'ilike', 'ausenc'),     # ausencias
+])
+
+# Solo licencias médicas (para total_days)
+leaves_med = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+])
+
+period_start = payslip.date_from
+period_end = payslip.date_to
+
+total_days = 0
+for lv in leaves_med:
+    lf = lv.date_from.date()
+    lt = lv.date_to.date()
+    start = lf if lf > period_start else period_start
+    end = lt if lt < period_end else period_end
+    if start <= end:
+        total_days += (end - start).days + 1
+
+has_leave = bool(leaves_med)
+
+if not has_leave and contract.pension_option in ['afp', 'inp']:
+    year = payslip.date_from.year
+    month = payslip.date_from.month
+    first_day = payslip.date_from.replace(day=1)
+
+    if month < 12:
+        next_month = payslip.date_from.replace(month=month + 1, day=1)
+    else:
+        next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+
+    base = min(categories.get('GROSS', 0.0), tope)
+    result = base * tasa_sis / 100.0 if tasa_sis > 0 else 0.0
+
+elif has_leave:
+    # Buscar la liquidación anterior SIN licencias superpuestas.
+    prev_slips = payslip.env['hr.payslip'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('state', 'in', ['verify','done','paid']),
+        ('date_to', '<', payslip.date_from)
+    ], order='date_to desc', limit=12)
+    renta_imponible = 0.0
+    
+    for ps in prev_slips:
+        ps_leaves = payslip.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', ps.date_to),
+            ('date_to', '>=', ps.date_from),
+            '|',
+            ('holiday_status_id.name', 'ilike', 'enfermedad'),
+            ('holiday_status_id.name', 'ilike', 'médica'),
+        ], limit=1)
+        if ps_leaves:
+            continue 
+
+        lines = ps.line_ids.sudo()
+        # Sumar por categoría
+        total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code in ('IMPO', 'IMPONIBLE'))
+        if not total_impo:
+            total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code == 'GROSS')
+        renta_imponible = float(total_impo or 0.0)
+        break
+
+    valor_sis_vacaciones = ((min(renta_imponible, tope) / 30) * total_days) * (tasa_sis / 100.0)
+    valor_sis =  (min(categories.get('GROSS', 0.0), tope) * (tasa_sis / 100.0)) if tasa_sis > 0 else 0.0
+
+    result = valor_sis + valor_sis_vacaciones
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla Expectativa de Vida - Updated 03/12-->
+        <record id="hr_rule_Expec_vida" model="hr.salary.rule">
+            <field name="name">Seguro Social</field>
+            <field name="code">EXP_VIDA</field>
+            <field name="category_id" search="[('code','=','DEDU')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">170</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = not contract.is_retired_elderly
+]]>
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+result = 0.0
+
+# Siempre calcular, aunque sea 0
+year = payslip.date_from.year
+month = payslip.date_from.month
+first_day = payslip.date_from.replace(day=1)
+
+if month < 12:
+    next_month = payslip.date_from.replace(month=month + 1, day=1)
+else:
+    next_month = payslip.date_from.replace(year=year + 1, month=1, day=1)
+
+# Buscar indicador Previred del mes
+indicator = payslip.env['previred.indicator'].sudo().search([
+    ('date', '>=', first_day),
+    ('date', '<', next_month)
+], order='date desc', limit=1)
+
+tasa_expectativa_vida = indicator.expectativa_vida if indicator else 0.0
+tope = indicator.tope_afiliados_afp if indicator else 0.0
+                
+# Si tiene licencias, faltas o vacaciones
+leaves_any = payslip.env['hr.leave'].sudo().search([
+    ('employee_id', '=', employee.id),
+    ('state', '=', 'validate'),
+    ('date_from', '<=', payslip.date_to),
+    ('date_to', '>=', payslip.date_from),
+    '|',
+    ('holiday_status_id.name', 'ilike', 'enfermedad'),
+    ('holiday_status_id.name', 'ilike', 'médica'),
+])
+
+period_start = payslip.date_from
+period_end = payslip.date_to
+total_days = 0
+for lv in leaves_any:
+    lf = lv.date_from.date()
+    lt = lv.date_to.date()
+    start = lf if lf > period_start else period_start
+    end = lt if lt < period_end else period_end
+    if start <= end:
+        total_days += (end - start).days + 1
+        
+has_leave = bool(leaves_any)
+
+if has_leave:
+    # Buscar la liquidación anterior de 30 dias
+    prev_slips = payslip.env['hr.payslip'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('state', 'in', ['verify','done','paid']),
+        ('date_to', '<', payslip.date_from)
+    ], order='date_to desc', limit=12)
+    renta_imponible_licencia = 0.0
+
+    for ps in prev_slips:
+        ps_leaves = payslip.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', ps.date_to),
+            ('date_to', '>=', ps.date_from),
+            '|', '|', '|',
+            ('holiday_status_id.name', 'ilike', 'enfermedad'),
+            ('holiday_status_id.name', 'ilike', 'médica'),
+            ('holiday_status_id.name', 'ilike', 'falta'),      # faltas
+            ('holiday_status_id.name', 'ilike', 'ausenc'),     # ausencias
+        ], limit=1)
+        if ps_leaves:
+            continue 
+
+        lines = ps.line_ids.sudo()
+        # Sumar por categoría
+        total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code in ('IMPO', 'IMPONIBLE'))
+        if not total_impo:
+            total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code == 'GROSS')
+        renta_imponible_licencia = float(total_impo or 0.0)
+        break
+
+    if total_days >= 30:
+        result = renta_imponible_licencia * tasa_expectativa_vida / 100.0 if tasa_expectativa_vida > 0 else 0.0
+    else:
+        renta_imponible = min(categories.get('GROSS', 0.0), tope)
+        rima_proporcional = (renta_imponible_licencia / 30) * total_days
+        result = (renta_imponible + rima_proporcional) * tasa_expectativa_vida / 100.0 if tasa_expectativa_vida > 0 else 0.0
+else:
+    base = min(categories.get('GROSS', 0.0), tope)
+    result = base * tasa_expectativa_vida / 100.0 if tasa_expectativa_vida > 0 else 0.0
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <record id="hr_rule_total_descuentos" model="hr.salary.rule">
+            <field name="name">Total Descuentos</field>
+            <field name="code">TOTAL_DSCTOS</field>
+            <field name="category_id" search="[('code','=','TOTAL_DESC')]"/> <!-- Asegúrate de que esta categoría exista -->
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">171</field>
+        
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[result = bool(payslip.employee_id)]]>
+            </field>
+        
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+afp = categories.get('AFP', 0.0)
+salud = categories.get('SALUD', 0.0)
+isapre_extra = categories.get('EXD', 0.0)
+afc = categories.get('AFC_T', 0.0)
+apvi = categories.get('APVI', 0.0)
+apvc_t = categories.get('APVC_T', 0.0)
+apvc_e = categories.get('APV_EMP', 0.0)
+impuesto = categories.get('RETENCION', 0.0)
+ccaf_credit = categories.get('CCAF_CREDITO', 0.0)
+ccaf_ahorro = categories.get('CCAF_AHORRO', 0.0)
+ccaf_dental = categories.get('CCAF_DENTAL', 0.0)
+ccaf_seguro = categories.get('CCAF_SEG_VIDA', 0.0)
+ccaf_otros = categories.get('CCAF_OTROS', 0.0)
+anticipos_prestamos = categories.get('others', 0.0)
+
+result = int(round(
+    afp + salud + afc + apvi + apvc_t + apvc_e +
+    isapre_extra + impuesto + ccaf_credit + ccaf_dental + ccaf_seguro +
+    ccaf_ahorro + ccaf_otros + anticipos_prestamos
+))]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+    </data>
+</odoo>

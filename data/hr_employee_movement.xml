@@ -1,0 +1,199 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Tipo de Movimientos Bonificaciones -->
+        <record id="record_bonificaciones" model="hr.employee.movement.type">
+            <field name="name">Bonificaciones</field>
+            <field name="earn_type">imponible</field>    
+        </record>
+
+        <!-- Tipo de Movimientos Aguinaldo -->
+        <record id="record_aguinaldo" model="hr.employee.movement.type">
+            <field name="name">Aguinaldo</field>
+            <field name="earn_type">no_imponible</field>
+        </record>
+
+        <!-- Tipo de Movimientos Comisiones -->
+        <record id="record_comisiones" model="hr.employee.movement.type">
+            <field name="name">Comisiones</field>
+            <field name="earn_type">imponible</field>   
+        </record>
+
+        <!-- Tipo de Movimiento Viatico -->
+        <record id="record_viatico" model="hr.employee.movement.type">
+            <field name="name">Viático</field>
+            <field name="earn_type">no_imponible</field>
+        </record>
+
+        <!-- Tipo de movimiento para Anticipo -->
+        <record id="record_anticipo" model="hr.employee.movement.type">
+            <field name="name">Anticipo</field>
+            <field name="earn_type">others</field>
+        </record>
+
+        <!-- Tipo de movimento para Prestamos -->
+        <record id="record_prestamos" model="hr.employee.movement.type">
+            <field name="name">Préstamos</field>
+            <field name="earn_type">others</field>
+        </record>
+
+        <!-- Tipo de movimento para Horas extras no pactadas -->
+        <record id="record_horas_extras_no_pactadas" model="hr.employee.movement.type">
+            <field name="name">Horas extras no pactadas</field>
+            <field name="earn_type">imponible</field>
+        </record>
+
+        <!-- Tipo de movmiento causales de termino de contrato -->
+        <record id="record_causales_termino_contrato" model="hr.employee.movement.type">
+            <field name="name">Causales de Término de Contrato</field>
+            <field name="earn_type">others</field>
+        </record>
+
+        <!-- Art. 159 N°1: Mutuo acuerdo de las partes  -->
+        <record id="record_causales_termino_contrato_renuncia" model="hr.employee.hr.event.type">
+            <field name="name">Mutuo acuerdo de las partes </field>
+            <field name="code">3</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 159 N°2: Renuncia Del Trabajador  -->
+        <record id="record_causales_termino_contrato_renuncia_trabajador" model="hr.employee.hr.event.type">
+            <field name="name">Renuncia Del Trabajador</field>
+            <field name="code">4</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 159 N°3: Muerte del trabajador  -->
+        <record id="record_causales_termino_contrato_muerte_trabajador" model="hr.employee.hr.event.type">
+            <field name="name">Muerte del trabajador</field>
+            <field name="code">5</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 159 N°4: Vencimiento del plazo convenido -->
+        <record id="record_causales_termino_contrato_vencimiento_plazo" model="hr.employee.hr.event.type">
+            <field name="name">Vencimiento del plazo convenido</field>
+            <field name="code">6</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 159 N°5: Conclusión del trabajo o servicio  -->
+        <record id="record_causales_termino_contrato_conclusion_trabajo" model="hr.employee.hr.event.type">
+            <field name="name">Conclusión del trabajo o servicio</field>
+            <field name="code">7</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 159 N°6: Caso fortuito o fuerza mayor  -->
+        <record id="record_causales_termino_contrato_fuerza_mayor" model="hr.employee.hr.event.type">
+            <field name="name">Caso fortuito o fuerza mayor</field>
+            <field name="code">8</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra A): Falta de probidad  -->
+        <record id="record_causales_termino_contrato_falta_probidad" model="hr.employee.hr.event.type">
+            <field name="name">Falta de probidad</field>
+            <field name="code">24</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra B): Conductas de acoso sexual -->
+        <record id="record_causales_termino_contrato_acoso_sexual" model="hr.employee.hr.event.type">
+            <field name="name">Conductas de acoso sexual</field>
+            <field name="code">25</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra C): Vías de hecho -->
+        <record id="record_causales_termino_contrato_vias_hecho" model="hr.employee.hr.event.type">
+            <field name="name">Vías de hecho</field>
+            <field name="code">26</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra D): Injurias -->
+        <record id="record_causales_termino_contrato_injurias" model="hr.employee.hr.event.type">
+            <field name="name">Injurias</field>
+            <field name="code">27</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra E): Conducta inmoral  -->
+        <record id="record_causales_termino_contrato_conducta_inmoral" model="hr.employee.hr.event.type">
+            <field name="name">Conducta inmoral</field>
+            <field name="code">28</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N°1 Letra F): Conductas de acoso laboral -->
+        <record id="record_causales_termino_contrato_acoso_laboral" model="hr.employee.hr.event.type">
+            <field name="name">Conductas de acoso laboral</field>
+            <field name="code">29</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 2: Negociaciones prohibidas por escrito -->
+        <record id="record_causales_termino_contrato_negociaciones_prohibidas" model="hr.employee.hr.event.type">
+            <field name="name">Negociaciones prohibidas por escrito</field>
+            <field name="code">11</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 3: No concurrencia a las labores -->
+        <record id="record_causales_termino_contrato_no_concurrencia" model="hr.employee.hr.event.type">
+            <field name="name">No concurrencia a las labores</field>
+            <field name="code">12</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 4: Abandono del trabajo -->
+        <record id="record_causales_termino_contrato_abandono_trabajo" model="hr.employee.hr.event.type">
+            <field name="name">Abandono del trabajo</field>
+            <field name="code">13</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 5: Actos, omisiones o imprudencias temerarias -->
+        <record id="record_causales_termino_contrato_actos_imprudencias" model="hr.employee.hr.event.type">
+            <field name="name">Actos, omisiones o imprudencias temerarias</field>
+            <field name="code">14</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 6: Perjuicio material causadointencionalmente -->
+        <record id="record_causales_termino_contrato_perjuicio_material" model="hr.employee.hr.event.type">
+            <field name="name">Perjuicio material causado intencionalmente</field>
+            <field name="code">15</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 160 N° 7: Incumplimiento grave de las obligaciones -->
+        <record id="record_causales_termino_contrato_incumplimiento_grave" model="hr.employee.hr.event.type">
+            <field name="name">Incumplimiento grave de las obligaciones</field>
+            <field name="code">16</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 161 Inciso 1°: Necesidades de la empresa -->
+        <record id="record_causales_termino_contrato_necesidades_empresa" model="hr.employee.hr.event.type">
+            <field name="name">Necesidades de la empresa</field>
+            <field name="code">18</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 161 Inciso 2°: desahucio escrito del empleador -->
+        <record id="record_causales_termino_contrato_desahucio_empleador" model="hr.employee.hr.event.type">
+            <field name="name">Desahucio escrito del empleador</field>
+            <field name="code">19</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+        <!-- Art. 163 Bis: Procedimiento concursal de liquidación -->
+        <record id="record_causales_termino_contrato_procedimiento_concursal" model="hr.employee.hr.event.type">
+            <field name="name">Procedimiento concursal de liquidación</field>
+            <field name="code">20</field>
+            <field name="movement_id" ref="l10n_cl_simpledigital_payroll.record_causales_termino_contrato"/>
+        </record>
+
+    </data>
+</odoo>

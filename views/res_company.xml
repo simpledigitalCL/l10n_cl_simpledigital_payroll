@@ -1,0 +1,54 @@
+<odoo>
+    <!-- Page Gratificación -->
+    <record id="view_company_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.payroll</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='branches']" position="after">
+                <page string="Gratificación" name="gratification">
+                    <group>
+                        <group string="Configuración de Gratificación">
+                            <field name="gratification_enabled" />
+                            <field name="gratification_type" invisible="not gratification_enabled" />
+                            <field name="gratification_percentage" invisible="not gratification_enabled or gratification_type == '50'"/>
+                            <field name="gratification_base" invisible="not gratification_enabled" />
+                        </group>
+                        <group string="Períodos de Pago" invisible="not gratification_enabled or gratification_type == '50'">
+                            <field name="gratification_period" invisible="not gratification_enabled"/>
+                            <field name="gratification_payment_date" invisible="not gratification_enabled"/>
+                        </group>
+                        <group string="Ganancia Neta" invisible="not gratification_enabled or gratification_type == '50'">
+                            <button 
+                                name="action_get_annual_net_profit" 
+                                string="Obtener desde Contabilidad" 
+                                type="object" 
+                                class="btn-primary"
+                                help="Obtener ganancia neta desde reportes contables"
+                            />
+                            <field name="annual_net_profit" invisible="not gratification_enabled"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Page mutual y caja de compensacion -->
+            <xpath expr="//page[@name='gratification']" position="after">
+                <page string="Instituciones Relacionadas" name="institutions">
+                    <group>
+                        <group name="compensacion" string="Compensación">
+                            <field name="caja_compensacion" />
+                        </group>
+
+                        <group name="security_instituciones" string="Instituciones de Seguridad">
+                            <field name="has_mutual" />
+                            <field name="mutual" invisible="not has_mutual" />
+                            <field name="rate_base" invisible="not has_mutual"/>
+                            <field name="rate_additional" invisible="not has_mutual" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Grupo para empleados que pueden ver sus propias nóminas -->
+        <record id="group_hr_payroll_employee" model="res.groups">
+            <field name="name">Empleado: Ver Liquidaciones</field>
+        </record>
+    </data>
+</odoo>

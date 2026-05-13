@@ -1,0 +1,35 @@
+# Translation of l10n_cl_simpledigital_payroll to Spanish (Chile)
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-15 10:16+0000\n"
+"PO-Revision-Date: 2023-11-15 10:16+0000\n"
+"Last-Translator: Simpledigital.cl <info@simpledigital.cl>\n"
+"Language-Team: Simpledigital.cl <info@simpledigital.cl>\n"
+"Language: es_CL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#. module: l10n_cl_simpledigital_payroll
+#: model:ir.model.fields,field_description:l10n_cl_simpledigital_payroll.field_hr_contract__colocation
+msgid "Colocation"
+msgstr "Asig. Colocación"
+
+#. module: l10n_cl_simpledigital_payroll
+#: model:ir.model.fields,help:l10n_cl_simpledigital_payroll.field_hr_contract__colocation
+msgid "Colocation amount for the employee."
+msgstr "Monto de colocación para el empleado."
+
+#. module: l10n_cl_simpledigital_payroll
+#: model:ir.model.fields,field_description:l10n_cl_simpledigital_payroll.field_hr_contract__movility
+msgid "Movility"
+msgstr "Movilidad"
+
+#. module: l10n_cl_simpledigital_payroll
+#: model:ir.model.fields,help:l10n_cl_simpledigital_payroll.field_hr_contract__movility
+msgid "Movility amount for the employee."
+msgstr "Monto de movilidad para el empleado."

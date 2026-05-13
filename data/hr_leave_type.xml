@@ -1,0 +1,23 @@
+<odoo>
+    <data noupdate="1">
+        <record id="hr_leave_type_vacaciones_legales" model="hr.leave.type">
+            <field name="name">Vacaciones Legales Chile</field>
+            <field name="leave_validation_type">manager</field>
+            <field name="employee_requests">yes</field>
+            <field name="allocation_validation_type">manager</field>
+            <field name="show_on_dashboard">true</field>
+            <field name="support_document">false</field>
+            <field name="include_business_days">true</field>
+            <field name="work_entry_type_id" ref="l10n_cl_simpledigital_payroll.work_entry_type_paid_cl"/>
+        </record>
+
+        <record id="hr_leave_type_faltas" model="hr.leave.type">
+            <field name="name">Faltas</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="requires_allocation">no</field>
+            <field name="show_on_dashboard">true</field>
+            <field name="support_document">true</field>
+            <field name="work_entry_type_id" ref="l10n_cl_simpledigital_payroll.work_entry_type_unpaid_cl"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="structure_type_chile" model="hr.payroll.structure.type">
+            <field name="name">Empleado Chile</field>
+        </record>
+
+        <record id="structure_chile" model="hr.payroll.structure">
+            <field name="name">Nómina Chile</field>
+            <field name="code">CHILE_PAY</field>
+            <field name="type_id" ref="structure_type_chile"/>
+        </record>
+
+        <record id="structure_type_chile" model="hr.payroll.structure.type">
+            <field name="name">Empleado Chile</field>
+            <field name="default_struct_id" ref="structure_chile"/>
+        </record>
+    </data>
+</odoo>

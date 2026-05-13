@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View for Communes -->
+        <record id="view_res_country_commune_tree" model="ir.ui.view">
+            <field name="name">res.country.commune.tree</field>
+            <field name="model">res.country.commune</field>
+            <field name="arch" type="xml">
+                <list string="Communes">
+                    <field name="codigo"/>
+                    <field name="name"/>
+                    <field name="state_id"/>
+                    <field name="country_id"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View for Communes -->
+        <record id="view_res_country_commune_form" model="ir.ui.view">
+            <field name="name">res.country.commune.form</field>
+            <field name="model">res.country.commune</field>
+            <field name="arch" type="xml">
+                <form string="Commune">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="codigo"/>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="country_id"/>
+                                <field name="state_id" domain="[('country_id', '=', country_id)]"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

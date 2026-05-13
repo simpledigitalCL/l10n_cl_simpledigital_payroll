@@ -1,0 +1,192 @@
+<odoo>
+    <record id="view_previred_indicator_list" model="ir.ui.view">
+        <field name="name">previred.indicator.list</field>
+        <field name="model">previred.indicator</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_previred_indicator_form" model="ir.ui.view">
+        <field name="name">previred.indicator.form</field>
+        <field name="model">previred.indicator</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_scraping_previred" type="object" string="Scrapear Previred" class="oe_highlight" context="{'default_date': date}"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="currency_id" invisible="1" />
+                    </group>
+
+                    <notebook>
+                        <page string="Previred" name="previred">
+                            <group>
+                                <group>
+                                    <!-- VALOR UF -->
+                                    <separator string="Valor UF"/>
+                                    <field name="uf_value_on_month"/>
+                                    <field name="uf_value_last_month" />
+
+                                    <!-- TOPE RENTAS IMPONIBLES -->
+                                    <separator string="RENTAS TOPES IMPONIBLES"/>
+                                    <field name="tope_afiliados_afp"/>
+                                    <field name="tope_afiliados_ips" />
+                                    <field name="tope_seguro_cesantia" />
+
+                                    <!-- TASAS AFP -->
+                                    <separator string="TASA COTIZACIÓN OBLIGATORIO AFP"/>
+                                    <label for="capital_tasa_dependiente" string="Capital"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="capital_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="capital_tasa_pagar" />
+                                        <field name="capital_tasa_independiente" />
+                                    </div>
+
+                                    <label for="cuprum_tasa_dependiente" string="Cuprum"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="cuprum_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="cuprum_tasa_pagar" />
+                                        <field name="cuprum_tasa_independiente" />
+                                    </div>
+
+                                    <label for="habitat_tasa_dependiente" string="Habitat"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="habitat_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="habitat_tasa_pagar" />
+                                        <field name="habitat_tasa_independiente" />
+                                    </div>
+
+                                    <label for="planvital_tasa_dependiente" string="PlanVital"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="planvital_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="planvital_tasa_pagar" />
+                                        <field name="planvital_tasa_independiente" />
+                                    </div>
+
+                                    <label for="provida_tasa_dependiente" string="ProVida"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="provida_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="provida_tasa_pagar" />
+                                        <field name="provida_tasa_independiente" />
+                                    </div>
+
+                                    <label for="modelo_tasa_dependiente" string="Modelo"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="modelo_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="modelo_tasa_pagar" />
+                                        <field name="modelo_tasa_independiente" />
+                                    </div>
+
+                                    <label for="uno_tasa_dependiente" string="Uno"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="uno_tasa_dependiente"  />
+                                        <field name="cargo_empleador"/>
+                                        <field name="uno_tasa_pagar" />
+                                        <field name="uno_tasa_independiente" />
+                                    </div>
+
+                                    <!-- SEGURO DE CESANTÍA (AFC) -->
+                                    <separator string="SEGURO DE CESANTÍA (AFC)"/>
+                                    <label for="plazo_indefinido_empleador" string="Plazo Indefinido"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="plazo_indefinido_empleador"  />
+                                        <field name="plazo_indefinido_trabajador" />
+                                    </div>
+
+                                    <label for="plazo_fijo_empleador" string="Plazo Fijo"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="plazo_fijo_empleador"  />
+                                    </div>
+
+                                    <label for="plazo_indefinido_empleador_more_11" string="Plazo Indefinido 11 años o más"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="plazo_indefinido_empleador_more_11"  />
+                                    </div>
+
+                                    <label for="trabajador_casa" string="Trabajador de Casa Particula"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="trabajador_casa"  />
+                                    </div>
+                                    
+                                    <!-- AHORRO PREVISIONAL VOLUNTARIO (APV)  -->
+                                    <separator string="AHORRO PREVISIONAL VOLUNTARIO (APV)"/>
+                                    <field name="tope_mensual_apv" />
+                                    <field name="tope_anual_apv" />
+
+                                    <!-- DEPÓSITO CONVENIDO -->
+                                    <separator string="DEPÓSITO CONVENIDO"/>
+                                    <field name="tope_anual_deposito_convenido" />
+                                </group>
+
+                                <group>
+                                    <separator string="Valor UTM"/>
+                                    <label for="capital_tasa_dependiente" string="Valor UTM - UTA"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="utm_value"  />
+                                        <field name="uta_value" />
+                                    </div>
+
+                                    <!-- RENTAS MINIMAS IMPONIBLES -->
+                                    <separator string="RENTAS MÍNIMAS IMPONIBLES"/>
+                                    <field name="trab_dependiente_independiente"/>
+                                    <field name="minor_and_major" />
+                                    <field name="home_working" />
+                                    <field name="not_refund_income" />
+
+                                    <!-- SEGURO SOCIAL -->
+                                    <separator string="SEGURO SOCIAL"/>
+                                    <field name="expectativa_vida" />
+
+                                    <!-- SEGURO DE INVALIDEZ Y SOBREVIVENCIA (SIS) -->
+                                    <separator string="SEGURO DE INVALIDEZ Y SOBREVIVENCIA (SIS)"/>
+                                    <field name="tasa_sis" />
+
+                                    <separator string="DISTRIBUCIÓN DEL 7% SALUD, PARA EMPLEADORES AFILIADO A CCAF"/>
+                                    <field name="ccaf_empleadores_afiliados" />
+                                    <field name="fonasa_empleadores_afiliados" />
+
+                                    <separator string="COTIZACIÓN PARA TRABAJOS PESADOS "/>
+                                    <label for="uno_tasa_dependiente" string="Trabajo pesado"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="trabajo_pesado_empleador"  />
+                                        <field name="trabajo_pesado_trabajador" />
+                                    </div>
+
+                                    <label for="uno_tasa_dependiente" string="Trabajo menos pesado"/>
+                                    <div style="display: flex; gap: 10px;">
+                                        <field name="trabajo_menos_pesado_empleador"  />
+                                        <field name="trabajo_menos_pesado_trabajador" />
+                                    </div>
+
+                                    <separator string="ASIGNACIÓN FAMILIAR"/>
+                                    <field name="tramo_a">Tramo A</field>
+                                    <field name="tramo_b">Tramo B</field>
+                                    <field name="tramo_c">Tramo C</field>
+                                </group>
+                            </group>
+                        </page>
+                     </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_previred_indicator" model="ir.actions.act_window">
+        <field name="name">Indicadores Previsionales Previred</field>
+        <field name="res_model">previred.indicator</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

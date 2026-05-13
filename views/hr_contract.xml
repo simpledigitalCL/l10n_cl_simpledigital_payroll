@@ -1,0 +1,202 @@
+<odoo>
+    <!-- Agregar campo Centro de Costos -->
+    <record id="view_contract_form_inherit_analytic_account" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.analytic.account</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='hr_responsible_id']" position="after">
+                <field name="analytic_account_id" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Agregar campo jordana de trabajo -->
+    <record id="view_contract_form_inherit_work_schedule" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.work.schedule</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='resource_calendar_warning']" position="after">
+                <field name="work_schedule_id" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Campos de Asig. Colacion y Movilidad -->
+    <record id="view_contract_form_inherit_assignment_colocation_movility" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.assignment.colocation.movility</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='wage']" position="after">
+                <field name="movility" />
+                <field name="colocation" />
+                <field name="viatico_fijo" />
+
+                <field name="has_extra_hours" />
+                <field name="extra_hours" invisible="not has_extra_hours"/>
+                
+                <field name="company_has_gratification" invisible="1"/>
+                <field name="has_gratification" invisible="not company_has_gratification"/>
+                <field name="income_tax_type" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Page con Salud -->
+    <record id="view_contract_form_inherit_health_page" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.health.page</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='information']" position="after">
+                <page string="Salud" name="health">
+                    <group>                    
+                        <!-- Campo con label Isapre/Fonasa -->
+                        <group>
+                            <separator string="Datos de Salud"/>
+                            <field name="health_institution" />
+
+                            <!-- Fonasa -->
+                            <separator string="Datos Fonasa" colspan="2" invisible="health_institution != '07 - 102'"/>
+                            <field name="fonasa_type" invisible="health_institution != '07 - 102'"/>
+                        </group>
+                        
+                        <!-- Sección Isapre -->
+                        <group invisible="health_institution in ['07 - 102', '00 - 99']">
+                            <!-- Método de cálculo -->
+                            <separator string="Cotización Pactada"/>
+                            <field name="isapre_calc_type" />
+                            
+                            <!-- Campos de cálculo - Versión simplificada -->
+                            <field 
+                                name="isapre_plan_monto" 
+                                invisible="not isapre_calc_type == 'clp'"
+                                class="oe_number"
+                            />
+                            
+                            <field 
+                                name="isapre_uf_valor" 
+                                invisible="not isapre_calc_type == 'uf'"
+                                class="oe_number"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Page con Carga Familiar -->
+    <record id="view_contract_form_inherit_family_page" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.family.page</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='health']" position="after">
+                <page string="Carga Familiar" name="family">
+                    <group>
+                        <div class="o_form_label">
+                            <label for="has_family_loads" string="¿Tiene cargas familiares?" />
+                            <field name="has_family_loads"/>
+                        </div>
+
+                        <field name="family_loads_segment" invisible="not has_family_loads"/>
+                        <field name="family_simple_loads_count" invisible="not has_family_loads"/>
+                        <field name="family_maternal_loads_count" invisible="not has_family_loads"/>
+                        <field name="family_invalid_loads_count" invisible="not has_family_loads"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Page con AFP-->
+    <record id="hr_contract_form_inherit_afp" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.afp.page</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='health']" position="after">
+                <page string="Pensiones" name="AFP">
+                    <group>
+                        <field name="is_retired_elderly" />
+                        
+                        <separator string="Tipos de Pensiones"/>
+                        <field name="pension_option"/>
+                        
+                        <separator string="Tipos de AFP"/>
+                        <field name="afp_option" invisible="pension_option != 'afp'"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!--Page con AFC-->
+    <record id="view_contract_form_inherit_afc" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.afc.page</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='AFP']" position="after">
+                <page string="AFC" name="AFC">
+                    <group>
+                        <separator string="Seguro de Cesantía (AFC)" colspan="2"/>
+                        <div class="o_row">
+                            <field name="afc_enrolled" class="oe_inline"/>
+                            <label for="afc_enrolled" string="AFC Empleador"/>
+
+                            <field name="afc_enrolled_trabajador" class="oe_inline"/>
+                            <label for="afc_enrolled_trabajador" string="AFC Trabajador"/>
+                        </div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>    
+
+    <!-- Page con APVI / APVC -->
+    <record id="view_contract_form_inherit_apvi_apvc_page" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.apvi.apvc.page</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='contract_details_2']" position="replace">
+                <group>
+                    <group>
+                        <separator string="APVI / APVC"/>
+                        <field name="has_apvi" />
+                        <field name="has_apvc" />
+
+                        <separator string="Subsidios"/>
+                        <field name="has_empleo_joven"/>
+                    </group>
+
+                    <group string="Datos APVI / APVC">
+                        <field name="institucion_apvi_apvc" invisible="not has_apvi and not has_apvc"/>
+                        <field name="pay_format_apvi_apc" invisible="not has_apvi and not has_apvc"/>
+                        <field name="cotizacion_apvi" invisible="not has_apvi" />
+
+                        <field name="cotizacion_apvc_trabajador" invisible="not has_apvc" />
+                        <field name="cotizacion_apvc_empleador" invisible="not has_apvc" />
+                    </group>
+                </group>    
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Modificar string y help de wage -->
+    <record id="view_contract_form_inherit__wage_string_help" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.wage.string.help</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <field name="wage" position="attributes">
+                <attribute name="string">Sueldo Base</attribute>
+                <attribute name="help">Corresponde al sueldo base pactado en el contrato, sin incluir asignaciones ni bonos. No corresponde al sueldo bruto ni a la renta imponible.</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
