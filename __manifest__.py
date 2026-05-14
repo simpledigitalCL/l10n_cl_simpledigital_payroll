@@ -6,7 +6,16 @@
     "author": "Simpledigital.cl",
     "website": "https://simpledigital.cl",
     "license": "AGPL-3",
-    "depends": ["base","hr","hr_payroll","hr_work_entry","mail", "hr_payroll_account"],
+    "depends": [
+        "base",
+        "hr",
+        "hr_payroll",
+        "hr_work_entry",
+        "mail",
+        "hr_payroll_account",
+        "hr_holidays",
+        "hr_payroll_expense",
+    ],
     "data": [
         'data/hr_salary_structure.xml',
         'data/hr_salary_rule.xml',

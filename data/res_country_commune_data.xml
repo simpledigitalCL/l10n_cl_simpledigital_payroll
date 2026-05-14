@@ -94,8 +94,458 @@
             <field name="country_id" ref="base.cl"/>
             <field name="state_id" eval="ref('base.state_cl_06')"/>
         </record>
-        
 
+        <!-- Comunas Tabla Nº3 DT - Región de Los Lagos (Código región: 10) -->
+        <record id="commune_10507" model="res.country.commune">
+            <field name="codigo">10507</field>
+            <field name="name">Los Lagos</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <record id="commune_10508" model="res.country.commune">
+            <field name="codigo">10508</field>
+            <field name="name">Máfil</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <record id="commune_10509" model="res.country.commune">
+            <field name="codigo">10509</field>
+            <field name="name">Mariquina</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <record id="commune_10510" model="res.country.commune">
+            <field name="codigo">10510</field>
+            <field name="name">Paillaco</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <record id="commune_10511" model="res.country.commune">
+            <field name="codigo">10511</field>
+            <field name="name">Panguipulli</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <record id="commune_10512" model="res.country.commune">
+            <field name="codigo">10512</field>
+            <field name="name">Río Bueno</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_10')"/>
+        </record>
+
+        <!-- Comunas Tabla Nº3 DT - Región de Aysén (Código región: 11) -->
+        <record id="commune_11101" model="res.country.commune">
+            <field name="codigo">11101</field>
+            <field name="name">Coihaique</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11102" model="res.country.commune">
+            <field name="codigo">11102</field>
+            <field name="name">Lago Verde</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11201" model="res.country.commune">
+            <field name="codigo">11201</field>
+            <field name="name">Aisén</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11202" model="res.country.commune">
+            <field name="codigo">11202</field>
+            <field name="name">Cisnes</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11203" model="res.country.commune">
+            <field name="codigo">11203</field>
+            <field name="name">Guaitecas</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11301" model="res.country.commune">
+            <field name="codigo">11301</field>
+            <field name="name">Cochrane</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11302" model="res.country.commune">
+            <field name="codigo">11302</field>
+            <field name="name">O'higgins</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11303" model="res.country.commune">
+            <field name="codigo">11303</field>
+            <field name="name">Tortel</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11401" model="res.country.commune">
+            <field name="codigo">11401</field>
+            <field name="name">Chile Chico</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <record id="commune_11402" model="res.country.commune">
+            <field name="codigo">11402</field>
+            <field name="name">Río Ibáñez</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_11')"/>
+        </record>
+
+        <!-- Comunas Tabla Nº3 DT - Región de Magallanes (Código región: 12) -->
+        <record id="commune_12101" model="res.country.commune">
+            <field name="codigo">12101</field>
+            <field name="name">Punta Arenas</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12102" model="res.country.commune">
+            <field name="codigo">12102</field>
+            <field name="name">Laguna Blanca</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12103" model="res.country.commune">
+            <field name="codigo">12103</field>
+            <field name="name">Río Verde</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12104" model="res.country.commune">
+            <field name="codigo">12104</field>
+            <field name="name">San Gregorio</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12201" model="res.country.commune">
+            <field name="codigo">12201</field>
+            <field name="name">Cabo De Horno</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12202" model="res.country.commune">
+            <field name="codigo">12202</field>
+            <field name="name">Antártica</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12301" model="res.country.commune">
+            <field name="codigo">12301</field>
+            <field name="name">Porvenir</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12302" model="res.country.commune">
+            <field name="codigo">12302</field>
+            <field name="name">Primavera</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12303" model="res.country.commune">
+            <field name="codigo">12303</field>
+            <field name="name">Timaukel</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12401" model="res.country.commune">
+            <field name="codigo">12401</field>
+            <field name="name">Natales</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <record id="commune_12402" model="res.country.commune">
+            <field name="codigo">12402</field>
+            <field name="name">Torres Del Paine</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_12')"/>
+        </record>
+
+        <!-- Comunas Tabla Nº3 DT - Región Metropolitana (Código región: 13) -->
+        <record id="commune_13101" model="res.country.commune">
+            <field name="codigo">13101</field>
+            <field name="name">Santiago</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13102" model="res.country.commune">
+            <field name="codigo">13102</field>
+            <field name="name">Cerrillos</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13103" model="res.country.commune">
+            <field name="codigo">13103</field>
+            <field name="name">Cerro Navia</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13104" model="res.country.commune">
+            <field name="codigo">13104</field>
+            <field name="name">Conchalí</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13105" model="res.country.commune">
+            <field name="codigo">13105</field>
+            <field name="name">El Bosque</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13106" model="res.country.commune">
+            <field name="codigo">13106</field>
+            <field name="name">Estación Central</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13107" model="res.country.commune">
+            <field name="codigo">13107</field>
+            <field name="name">Huechuraba</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13108" model="res.country.commune">
+            <field name="codigo">13108</field>
+            <field name="name">Independencia</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13109" model="res.country.commune">
+            <field name="codigo">13109</field>
+            <field name="name">La Cisterna</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13110" model="res.country.commune">
+            <field name="codigo">13110</field>
+            <field name="name">La Florida</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13111" model="res.country.commune">
+            <field name="codigo">13111</field>
+            <field name="name">La Granja</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13112" model="res.country.commune">
+            <field name="codigo">13112</field>
+            <field name="name">La Pintana</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13113" model="res.country.commune">
+            <field name="codigo">13113</field>
+            <field name="name">La Reina</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13114" model="res.country.commune">
+            <field name="codigo">13114</field>
+            <field name="name">Las Condes</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13115" model="res.country.commune">
+            <field name="codigo">13115</field>
+            <field name="name">Lo Barnechea</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13116" model="res.country.commune">
+            <field name="codigo">13116</field>
+            <field name="name">Lo Espejo</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13117" model="res.country.commune">
+            <field name="codigo">13117</field>
+            <field name="name">Lo Prado</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13118" model="res.country.commune">
+            <field name="codigo">13118</field>
+            <field name="name">Macul</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13119" model="res.country.commune">
+            <field name="codigo">13119</field>
+            <field name="name">Maipú</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13120" model="res.country.commune">
+            <field name="codigo">13120</field>
+            <field name="name">Ñuñoa</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13121" model="res.country.commune">
+            <field name="codigo">13121</field>
+            <field name="name">Pedro Aguirre Cerda</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13122" model="res.country.commune">
+            <field name="codigo">13122</field>
+            <field name="name">Peñalolén</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13123" model="res.country.commune">
+            <field name="codigo">13123</field>
+            <field name="name">Providencia</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13124" model="res.country.commune">
+            <field name="codigo">13124</field>
+            <field name="name">Pudahuel</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13125" model="res.country.commune">
+            <field name="codigo">13125</field>
+            <field name="name">Quilicura</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13126" model="res.country.commune">
+            <field name="codigo">13126</field>
+            <field name="name">Quinta Normal</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13127" model="res.country.commune">
+            <field name="codigo">13127</field>
+            <field name="name">Recoleta</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13128" model="res.country.commune">
+            <field name="codigo">13128</field>
+            <field name="name">Renca</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13129" model="res.country.commune">
+            <field name="codigo">13129</field>
+            <field name="name">San Joaquín</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13130" model="res.country.commune">
+            <field name="codigo">13130</field>
+            <field name="name">San Miguel</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13131" model="res.country.commune">
+            <field name="codigo">13131</field>
+            <field name="name">San Ramón</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13132" model="res.country.commune">
+            <field name="codigo">13132</field>
+            <field name="name">Vitacura</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13201" model="res.country.commune">
+            <field name="codigo">13201</field>
+            <field name="name">Puente Alto</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13202" model="res.country.commune">
+            <field name="codigo">13202</field>
+            <field name="name">Pirque</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13203" model="res.country.commune">
+            <field name="codigo">13203</field>
+            <field name="name">San José De Maipo</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13301" model="res.country.commune">
+            <field name="codigo">13301</field>
+            <field name="name">Colina</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
+
+        <record id="commune_13302" model="res.country.commune">
+            <field name="codigo">13302</field>
+            <field name="name">Lampa</field>
+            <field name="country_id" ref="base.cl"/>
+            <field name="state_id" eval="ref('base.state_cl_rm')"/>
+        </record>
 
     </data>
 </odoo>
