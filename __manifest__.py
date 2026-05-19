@@ -45,6 +45,7 @@
         'report/report_payslip_templates.xml',
         # 'data/data_testing.xml',
     ],
+    "post_init_hook": "post_init_hook",
     "installable": True,
     "application": False,
     "price": 49.99,
