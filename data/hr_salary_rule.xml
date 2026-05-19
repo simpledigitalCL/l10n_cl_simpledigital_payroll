@@ -245,7 +245,7 @@ else:
             <field name="category_id" search="[('code','=','NOP_IMP')]"/>
             <field name="code">COLA</field>
             <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
-            <field name="sequence">20</field>
+            <field name="sequence">142</field>
             <field name="condition_select">python</field>
             <field name="condition_python">
 <![CDATA[
@@ -296,7 +296,7 @@ result = (contract.colocation or 0.0) * total_days / 30.0
             <field name="code">MOV</field>
             <field name="category_id" search="[('code','=','NOP_IMP')]"/>
             <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
-            <field name="sequence">30</field>
+            <field name="sequence">143</field>
             <field name="condition_select">python</field>
             <field name="condition_python">        
 <![CDATA[

@@ -1,4 +1,4 @@
-# l10n_cl_simpledigital_payroll
+# l10n_cl_simpledigital_payroll V1.0
 
 Módulo de nómina chilena para Odoo 18, desarrollado por Simpledigital.cl.
 

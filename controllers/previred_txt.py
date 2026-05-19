@@ -656,7 +656,12 @@ class PreviredExportController(http.Controller):
 
             # Campo 70 — Cotización Fonasa
             if health_code == '07':
-                cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * (previred_indicator.fonasa_empleadores_afiliados / 100)
+                _ccaf = contract.employee_id.company_id.caja_compensacion or ''
+                if _ccaf and _ccaf != '00':
+                    tasa_fonasa = previred_indicator.fonasa_empleadores_afiliados / 100
+                else:
+                    tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados + previred_indicator.ccaf_empleadores_afiliados) / 100
+                cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * tasa_fonasa
                 cotizacion_fonasa = int(round(cotizacion_fonasa))
             else:
                 cotizacion_fonasa = ""
@@ -818,9 +823,8 @@ class PreviredExportController(http.Controller):
                         
                         codigo_accidente_trabajo_isl = f"{cotizacion_ccaf_fonasa:08d}"  
                     else:
-                        # Empleador NO afiliado a CCAF: usar 6.45% (total sin CCAF)
-                        cotizacion_ccaf_fonasa = int(renta_imponible_int * 0.0645) 
-                        codigo_accidente_trabajo_isl = f"{cotizacion_ccaf_fonasa:08d}"  
+                        # Empleador NO afiliado a CCAF: no hay cotización CCAF
+                        codigo_accidente_trabajo_isl = "00000000"
                 else:
                     codigo_accidente_trabajo_isl = "00000000"
             else:
@@ -1003,7 +1007,8 @@ class PreviredExportController(http.Controller):
             # ==================== LOGGING DE DEBUG ====================
             # Logger consolidado al final para debugging de campos críticos
             _logger.info(f"PREVIRED - {first_name} {paternal_surname} {maternal_surname}")
-            _logger.info(f":Renta imponible SC: {renta_imponible_seguro_cesantia}")
+            _logger.info(f":COTIZACION FONASA: {cotizacion_fonasa}")
+            _logger.info(f"COTIZACION CCFA: {codigo_accidente_trabajo_isl}")
             # ==================== FIN LOGGING DEBUG ====================
 
             # Generar línea principal (siempre se genera)
@@ -1431,7 +1436,12 @@ class PreviredExportController(http.Controller):
 
             # Campo 70 — Cotización Fonasa
             if health_code == '07':
-                cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * (previred_indicator.fonasa_empleadores_afiliados / 100)
+                _ccaf = contract.employee_id.company_id.caja_compensacion or ''
+                if _ccaf and _ccaf != '00':
+                    tasa_fonasa = previred_indicator.fonasa_empleadores_afiliados / 100
+                else:
+                    tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados + previred_indicator.ccaf_empleadores_afiliados) / 100
+                cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * tasa_fonasa
                 cotizacion_fonasa = int(round(cotizacion_fonasa))
             else:
                 cotizacion_fonasa = ""
@@ -1593,9 +1603,8 @@ class PreviredExportController(http.Controller):
                         
                         codigo_accidente_trabajo_isl = f"{cotizacion_ccaf_fonasa:08d}"  
                     else:
-                        # Empleador NO afiliado a CCAF: usar 6.45% (total sin CCAF)
-                        cotizacion_ccaf_fonasa = int(renta_imponible_int * 0.0645) 
-                        codigo_accidente_trabajo_isl = f"{cotizacion_ccaf_fonasa:08d}"  
+                        # Empleador NO afiliado a CCAF: no hay cotización CCAF
+                        codigo_accidente_trabajo_isl = "00000000"
                 else:
                     codigo_accidente_trabajo_isl = "00000000"
             else:
