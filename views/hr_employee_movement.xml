@@ -94,6 +94,7 @@
                     <group>
                         <group>
                             <field name="name" invisible="1"/>
+                            <field name="company_id"/>
                             <field name="earn_type" readonly="1"/>
                             <field name="date"/>
                         </group>
@@ -133,9 +134,9 @@
             <list string="Movimientos de Empleados">
                 <field name="name"/>
                 <field name="movement_type_id"/>
+                <field name="company_id" optional="show"/>
                 <field name="date"/>
                 <field name="total_amount" widget="monetary" sum="total"/>
-
                 <field name="currency_id" column_invisible="True"/>
             </list>
         </field>
@@ -149,11 +150,22 @@
             <search>
                 <field name="name"/>
                 <field name="movement_type_id"/>
+                <field name="company_id"/>
                 <field name="date"/>
                 <separator/>
-                <filter name="date_quick_ranges" string="Fecha" date="date"/>
                 <filter name="today" string="Hoy" domain="[('date', '=', context_today())]"/>
-
+                <filter name="this_month" string="Este mes"
+                    domain="[('date', '&gt;=', (context_today()).strftime('%Y-%m-01'))]"/>
+                <filter name="date_quick_ranges" string="Fecha" date="date"/>
+                <separator/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_movement_type" string="Tipo de Movimiento"
+                        context="{'group_by': 'movement_type_id'}"/>
+                    <filter name="group_company" string="Empresa"
+                        context="{'group_by': 'company_id'}"/>
+                    <filter name="group_date_month" string="Mes"
+                        context="{'group_by': 'date:month'}"/>
+                </group>
             </search>
         </field>
     </record>

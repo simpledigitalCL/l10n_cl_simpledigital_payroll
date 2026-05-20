@@ -10,6 +10,12 @@ class HrEmployeeMovement(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='Referencia', required=True, default='Nuevo')
+    company_id = fields.Many2one(
+        'res.company',
+        string='Empresa',
+        required=True,
+        default=lambda self: self.env.company
+    )
     movement_type_id = fields.Many2one(
         'hr.employee.movement.type',
         string='Tipo de Movimiento',
@@ -38,6 +44,14 @@ class HrEmployeeMovement(models.Model):
         readonly=True,
         store=True
     )
+
+    def _auto_init(self):
+        super()._auto_init()
+        self._cr.execute("""
+            UPDATE hr_employee_movement
+            SET company_id = 1
+            WHERE company_id IS NULL
+        """)
 
     @api.depends('movement_line_ids.amount')
     def _compute_total_amount(self):
@@ -240,6 +254,52 @@ class HrEmployeeMovementType(models.Model):
     )
     contract_id = fields.Many2one('hr.contract', string="Contrato")
 
+    def _auto_init(self):
+        super()._auto_init()
+        rules = self.env['hr.salary.rule'].search([
+            ('code', 'like', 'MOV_%'),
+            ('condition_python', 'not like', 'company_id'),
+        ])
+        for rule in rules:
+            try:
+                mid = int(rule.code.split('_')[1])
+            except (IndexError, ValueError):
+                continue
+            rule.write({
+                'condition_python': f"""
+employee = contract.employee_id
+from_date = payslip.date_from
+to_date = payslip.date_to
+
+lines = payslip.env['hr.employee.movement.line'].search([
+    ('employee_id', '=', employee.id),
+    ('movement_type_id', '=', {mid}),
+    ('movement_id.date', '>=', from_date),
+    ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
+])
+
+result = bool(lines)
+""",
+                'amount_python_compute': f"""
+result = 0.0
+employee = contract.employee_id
+from_date = payslip.date_from
+to_date = payslip.date_to
+
+lines = payslip.env['hr.employee.movement.line'].search([
+    ('employee_id', '=', employee.id),
+    ('movement_type_id', '=', {mid}),
+    ('movement_id.date', '>=', from_date),
+    ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
+])
+
+if lines:
+    result = sum(lines.mapped('amount'))
+""",
+            })
+
     @api.model
     def create(self, vals):
         movement_type = super().create(vals)
@@ -287,6 +347,7 @@ lines = payslip.env['hr.employee.movement.line'].search([
     ('movement_type_id', '=', {movement_type.id}),
     ('movement_id.date', '>=', from_date),
     ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
 ])
 
 result = bool(lines)
@@ -303,6 +364,7 @@ lines = payslip.env['hr.employee.movement.line'].search([
     ('movement_type_id', '=', {movement_type.id}),
     ('movement_id.date', '>=', from_date),
     ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
 ])
 
 if lines:
@@ -438,6 +500,7 @@ lines = payslip.env['hr.employee.movement.line'].search([
     ('movement_type_id', '=', {self.id}),
     ('movement_id.date', '>=', from_date),
     ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
 ])
 
 result = bool(lines)
@@ -454,6 +517,7 @@ lines = payslip.env['hr.employee.movement.line'].search([
     ('movement_type_id', '=', {self.id}),
     ('movement_id.date', '>=', from_date),
     ('movement_id.date', '<=', to_date),
+    ('movement_id.company_id', '=', payslip.company_id.id),
 ])
 
 if lines:
