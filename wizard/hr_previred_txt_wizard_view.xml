@@ -5,6 +5,7 @@
         <field name="arch" type="xml">
             <form string="Exportar Archivo Previred TXT">
                 <group>
+                    <field name="company_id"/>
                     <field name="period"/>
                 </group>
                 <footer>

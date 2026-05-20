@@ -7,6 +7,12 @@ class HrLibroRemuneracionesWizard(models.TransientModel):
     _name = 'hr.libro.remuneraciones.wizard'
     _description = 'Wizard para exportar Libro de Remuneraciones CSV'
 
+    company_id = fields.Many2one(
+        'res.company',
+        string='Empresa',
+        required=True,
+        default=lambda self: self.env.company,
+    )
     date_from = fields.Date(
         string='Fecha Desde',
         required=True,
@@ -17,7 +23,7 @@ class HrLibroRemuneracionesWizard(models.TransientModel):
         required=True,
         default=lambda self: fields.Date.today()
     )
-    
+
     # Campos adicionales específicos para el libro de remuneraciones
     include_header = fields.Boolean(
         string='Incluir Encabezados',
@@ -40,7 +46,7 @@ class HrLibroRemuneracionesWizard(models.TransientModel):
             raise models.ValidationError('La fecha desde no puede ser mayor que la fecha hasta')
 
         # Generar el CSV usando el controlador
-        url = f'/libro_remuneraciones/csv?date_from={self.date_from}&date_to={self.date_to}&include_header={self.include_header}'
+        url = f'/libro_remuneraciones/csv?date_from={self.date_from}&date_to={self.date_to}&include_header={self.include_header}&company_id={self.company_id.id}'
         
         return {
             'type': 'ir.actions.act_url',
@@ -72,7 +78,7 @@ class HrLibroRemuneracionesWizard(models.TransientModel):
         domain = [
             ('date_from', '>=', self.date_from),
             ('date_to', '<=', self.date_to),
-            ('company_id', '=', self.env.company.id),
+            ('company_id', '=', self.company_id.id),
             ('state', 'in', ['done', 'paid'])
         ]
         return self.env['hr.payslip'].search(domain)

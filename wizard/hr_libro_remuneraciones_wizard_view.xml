@@ -6,6 +6,7 @@
             <form string="Exportar Libro de Remuneraciones">
                 <group>
                     <group>
+                        <field name="company_id"/>
                         <field name="date_from"/>
                         <field name="date_to"/>
                     </group>
@@ -13,13 +14,13 @@
                         <field name="include_header"/>
                     </group>
                 </group>
-                
+
                 <div class="oe_chatter">
                     <div class="alert alert-info" role="alert">
                         <strong>Información:</strong><br/>
                         • El archivo CSV contendrá todas las liquidaciones del período seleccionado<br/>
                         • Solo se incluirán liquidaciones en estado "Hecho" o "Pagado"<br/>
-                        • Se usará la empresa actual del usuario para filtrar las liquidaciones
+                        • Seleccione la empresa para filtrar las liquidaciones correctamente
                     </div>
                 </div>
 

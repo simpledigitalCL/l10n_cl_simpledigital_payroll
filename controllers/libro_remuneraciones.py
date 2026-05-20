@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 class LibroRemuneracionesController(http.Controller):
 
     @http.route('/libro_remuneraciones/csv', type='http', auth='user', methods=['GET'])
-    def export_libro_remuneraciones_csv(self, date_from, date_to, include_header='True', **kwargs):
+    def export_libro_remuneraciones_csv(self, date_from, date_to, include_header='True', company_id=None, **kwargs):
         """
         Endpoint para exportar el Libro de Remuneraciones en formato CSV
         """
@@ -20,9 +20,14 @@ class LibroRemuneracionesController(http.Controller):
             date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
             date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
             include_header = include_header.lower() == 'true'
-            
-            # Usar la empresa actual del usuario
-            company = request.env.company
+
+            # Usar la empresa indicada por parámetro; si no, la empresa de sesión
+            if company_id:
+                company = request.env['res.company'].sudo().browse(int(company_id))
+                if not company.exists():
+                    return request.make_response('Empresa no encontrada', headers={'Content-Type': 'text/plain'})
+            else:
+                company = request.env.company
             if not company:
                 return request.make_response('No se pudo determinar la empresa actual', headers={'Content-Type': 'text/plain'})
 

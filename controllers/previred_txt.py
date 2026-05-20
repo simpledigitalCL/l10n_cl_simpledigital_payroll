@@ -271,7 +271,7 @@ class PreviredExportController(http.Controller):
             return 0
 
     @http.route('/hr_payroll/previred/txt', auth='user')
-    def download_previred_txt(self, period=None, **kw):
+    def download_previred_txt(self, period=None, company_id=None, **kw):
         if period:
             try:
                 period_dt = datetime.strptime(period, '%m%Y')
@@ -294,17 +294,22 @@ class PreviredExportController(http.Controller):
         else:
             end_of_month = date(year, month + 1, 1)
             
-        _, dias_mes = calendar.monthrange(year, month)  
+        _, dias_mes = calendar.monthrange(year, month)
 
         # Obtener solo contratos activos
         period_start = period_dt.replace(day=1).date()
         period_end = period_dt.replace(day=dias_mes).date()
 
-        payslips = request.env['hr.payslip'].sudo().search([
+        domain = [
             ('date_from', '>=', period_start),
             ('date_from', '<=', period_end),
             ('state', 'in', ['verify', 'done', 'paid']),
-        ], order='employee_id')
+        ]
+
+        if company_id:
+            domain.append(('company_id', '=', int(company_id)))
+
+        payslips = request.env['hr.payslip'].sudo().search(domain, order='employee_id')
 
         lines = []
         for payslip in payslips:
@@ -1036,7 +1041,7 @@ class PreviredExportController(http.Controller):
         )
 
     @http.route('/hr_payroll/previred/csv', auth='user')
-    def download_previred_csv(self, period=None, **kw):
+    def download_previred_csv(self, period=None, company_id=None, **kw):
         """
         Genera un archivo CSV con los mismos datos del TXT de Previred.
         Los encabezados son números del 1 al 105 para facilitar la visualización.
@@ -1063,17 +1068,22 @@ class PreviredExportController(http.Controller):
         else:
             end_of_month = date(year, month + 1, 1)
             
-        _, dias_mes = calendar.monthrange(year, month)  
+        _, dias_mes = calendar.monthrange(year, month)
 
         # Obtener solo contratos activos
         period_start = period_dt.replace(day=1).date()
         period_end = period_dt.replace(day=dias_mes).date()
 
-        payslips = request.env['hr.payslip'].sudo().search([
+        domain = [
             ('date_from', '>=', period_start),
             ('date_from', '<=', period_end),
             ('state', 'in', ['verify', 'done', 'paid']),
-        ], order='employee_id')
+        ]
+
+        if company_id:
+            domain.append(('company_id', '=', int(company_id)))
+
+        payslips = request.env['hr.payslip'].sudo().search(domain, order='employee_id')
 
         # Crear el buffer CSV
         output = io.StringIO()
