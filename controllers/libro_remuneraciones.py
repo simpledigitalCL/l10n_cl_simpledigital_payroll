@@ -993,7 +993,7 @@ class LibroRemuneracionesController(http.Controller):
         asignacion_desgaste_herramienta = 0
 
         # Campo 74 - 2311 Asignación familiar legal total mensual (Art. 41) Int 8 OPCIONAL
-        asignacion_familiar_legal = 0
+        asignacion_familiar_legal = self._get_payslip_lines(payslip, ["ASIG_FAM"]) or 0
 
         # Campo 75 - 2306 Gastos por causa del trabajo (Art. 41) Int 8 OPCIONAL
         gastos_causa_trabajo = 0
@@ -1137,7 +1137,10 @@ class LibroRemuneracionesController(http.Controller):
         ccaf_credit_saving = self._get_ccaf_credit_saving(payslip)
 
         # Campo 120 - 3183 Otros descuentos autorizados y solicitados por el trabajador Int 8 OPCIONAL
-        ccaf_credit_others = self._get_ccaf_credit_others(payslip)
+        # Incluye otros créditos CCAF + Cuenta 2 AFP (ahorro voluntario del trabajador)
+        ccaf_credit_others = int(self._get_ccaf_credit_others(payslip) or 0)
+        cuenta2_afp = self._get_payslip_lines(payslip, ["CUENTA2"]) or 0
+        ccaf_credit_others = ccaf_credit_others + int(cuenta2_afp)
 
         # Campo 121 - 3154 Cotización adicional trabajo pesado - trabajador Int 8 OPCIONAL - Vacio por defecto
         cotizacion_adicional_trabajo_pesado = 0
@@ -1225,7 +1228,8 @@ class LibroRemuneracionesController(http.Controller):
             total_haberes_no_imponibles_no_tributables = (
                 int(float(movilizacion_total_mensual or 0)) +
                 int(float(colacion_total_mensual or 0)) +
-                int(float(viaticos_total_mensual or 0))
+                int(float(viaticos_total_mensual or 0)) +
+                int(float(asignacion_familiar_legal or 0))
             )
             total_haberes_no_imponibles_no_tributables = int(total_haberes_no_imponibles_no_tributables)
         except Exception:

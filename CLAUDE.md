@@ -12,9 +12,9 @@ Odoo 18 module for Chilean payroll (`l10n_cl_simpledigital_payroll`). Handles AF
 **Active service**: `odoo18-admin.service` (port 8068, config `/etc/odoo18-admin.conf`)  
 **Module path on server**: `/opt/odoo18/custom_addons/l10n_cl_simpledigital_payroll`  
 **Log file**: `/var/log/odoo18/odoo-admin.log`  
-**Database**: `Prueba_Simple`
+**Databases**: `odoo18-admin.conf` has **no `db_name`**, so the service hosts several DBs (e.g. `Prueba_Simple`, `SyS_Simple`, ...). Always pass `-d <DB>` explicitly. The module lives in `/opt/odoo18/custom_addons`, which is **only** in `odoo18-admin.conf`'s `addons_path` — other configs (`odoo18-sys.conf`, etc.) can't see it, so always use `-c /etc/odoo18-admin.conf` for this module regardless of which DB you target.
 
-There are 6 Odoo services on the server (`odoo18`, `odoo18-sys`, `odoo18-admin`, `odoo18-dev`, `odoo18-everfruit`, `odoo-delete-param`). Always target `odoo18-admin.service`.
+There are several Odoo services on the server. Always target `odoo18-admin.service` for this module. List DBs with `sudo -u postgres psql -lqt`.
 
 ### Updating a Python file
 
@@ -34,9 +34,30 @@ For XML/view/field changes, use upgrade instead of restart:
 ```bash
 sudo systemctl stop odoo18-admin.service
 sudo -u odoo /opt/odoo18/venv/bin/python /opt/odoo18/odoo-bin \
-    -c /etc/odoo18-admin.conf -d Prueba_Simple --stop-after-init \
+    -c /etc/odoo18-admin.conf -d <DB> --stop-after-init \
     -u l10n_cl_simpledigital_payroll
 sudo systemctl start odoo18-admin.service
+```
+
+### ⚠️ Salary-rule changes do NOT deploy via upgrade
+
+`data/hr_salary_rule.xml` is wrapped in `<data noupdate="1">`. The salary rules and categories are **seeded only at install time**; `-u` will NOT overwrite an existing rule's `amount_python_compute`, condition, etc. To push a rule-logic change to a running DB you must either edit the rule in the UI, or patch the field directly via `odoo-bin shell`:
+
+```bash
+# write a small script that does rule.amount_python_compute = ... ; env.cr.commit()
+sudo -u odoo /opt/odoo18/venv/bin/python /opt/odoo18/odoo-bin shell \
+    -c /etc/odoo18-admin.conf -d <DB> --no-http < /tmp/patch.py
+```
+
+Keep the repo XML in sync too (it's the seed for fresh installs). A rule change only affects **payslips recomputed after** the change — existing payslips keep their stored line values until recomputed.
+
+### Testing a report render headlessly
+
+```python
+# via odoo-bin shell — catches QWeb runtime errors the upgrade won't:
+ps = env['hr.payslip'].search([('line_ids','!=',False)], limit=1)
+html = env['ir.qweb']._render('hr_payroll.report_payslip',
+    {'docs': ps, 'o': ps, 'doc_ids': ps.ids, 'doc_model': 'hr.payslip'})
 ```
 
 ### Viewing logs
@@ -58,13 +79,34 @@ sudo tail -f /var/log/odoo18/odoo-admin.log | grep -E "PREVIRED|FONASA|CCAF"
 5. Builds a semicolon-delimited line per employee following the Previred long format spec
 6. Returns the file as a download
 
-The controller has two almost-identical code blocks (one for regular lines, one for additional movement lines). Changes to campo calculations must be applied in both places (~line 657 and ~line 1435).
+The controller has two almost-identical code blocks (one for regular lines, one for additional movement lines), each ending in a `formatted_line` f-string of all 105 campos. **Any campo change must be applied in both blocks** — grep for the `# Campo NN` comment to find both copies. Amount campos are sourced from the salary rules via `self._get_payslip_lines(payslip, ['CODE'])` (e.g. campo 101 = `AFC_T`, campo 102 = `AFC_EMPLEADOR`) to keep the logic centralized in the rules rather than recomputed here.
 
 ### Salary structure
 
 - Single structure: **"Nómina Chile"** (`data/hr_salary_rule.xml`)
-- `hooks.py:post_init_hook` patches the default BASIC and NET rules after install
+- `hooks.py:post_init_hook` patches the default BASIC and NET rules after install (renames them, and sets NET = `categories['GROSS'] + categories['habIMP'] - categories['TOTAL_DESC']`)
 - `hr.employee.movement` records (bonos, comisiones, etc.) link to payslips via `hr.previred.movement` and are included in the calculation through auto-generated salary rules
+
+**Category codes that trip people up** (these are `hr.salary.rule.category.code`, used to route/sum lines):
+
+| Concept | Category code | Notes |
+|---|---|---|
+| Sueldo Base | `IMP` | BASIC rule re-categorized to `IMP` by the post_init_hook |
+| Total imponible ("Sueldo imponible") | `GROSS` | Odoo default — **not** `BRUTO`. `categories['GROSS']` is the imponible base used everywhere |
+| Total no imponible | `habIMP` | sum of COLA/MOV/ASIG_FAM/etc. (`NOP_IMP` lines) |
+| Total descuentos | `TOTAL_DESC` | the `TOTAL_DSCTOS` rule sums the employee deduction categories |
+| Sueldo Líquido | `NET` | the NET line's category is `NET`, **not** the custom `NETO`. For the net value use `payslip.net_wage` |
+
+Employer contributions (`AFP_EMP`, `AFC_EMP`, `APV_EMP`, `AP_MUT`) are not employee-visible deductions and are excluded from the líquido. Common worked-entry codes referenced in rule logic: `WORK100` (asistencia), `LEAVECL120` (vacaciones), `LIC` (licencia médica), `LEAVE90`, `OUT`.
+
+### Payslip PDF report
+
+`report/report_payslip_templates.xml` inherits `hr_payroll.report_payslip` and:
+- replaces `worked_days_table` (Spanish headers, removes amounts)
+- replaces `payslip_lines_table` with a two-column **HABERES | DESCUENTOS** layout, computing `TOTAL HABERES` (= GROSS + habIMP) and reading `o.net_wage` for `LÍQUIDO A RECIBIR`
+- empties `to_pay` and appends a signature section
+
+Lines are routed to columns by category code; the totals reuse the existing subtotal lines so figures match the computed payslip.
 
 ### previred.indicator
 

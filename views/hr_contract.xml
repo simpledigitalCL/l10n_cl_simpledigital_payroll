@@ -170,6 +170,9 @@
                         <field name="has_apvi" />
                         <field name="has_apvc" />
 
+                        <separator string="Cuenta 2 AFP"/>
+                        <field name="has_cuenta2" />
+
                         <separator string="Subsidios"/>
                         <field name="has_empleo_joven"/>
                     </group>
@@ -181,6 +184,8 @@
 
                         <field name="cotizacion_apvc_trabajador" invisible="not has_apvc" />
                         <field name="cotizacion_apvc_empleador" invisible="not has_apvc" />
+
+                        <field name="cotizacion_cuenta2" invisible="not has_cuenta2" />
                     </group>
                 </group>    
             </xpath>

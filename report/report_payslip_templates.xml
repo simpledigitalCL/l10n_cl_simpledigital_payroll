@@ -55,6 +55,107 @@
             </div>
         </xpath>
 
+        <!-- Desglose del salario en dos columnas: HABERES | DESCUENTOS -->
+        <xpath expr="//div[@id='payslip_lines_table']" position="replace">
+            <div id="payslip_lines_table">
+                <!-- Categorías que van a cada columna -->
+                <t t-set="hab_cats" t-value="['BASICO','IMP','SUBSIDIOS','GROSS','NOP_IMP','BRUTO','habIMP']"/>
+                <t t-set="ded_cats" t-value="['AFP','SALUD','EXD','AFC_T','IPS','APVI','APVC_T','CUENTA2','RETENCION','CCAF_CREDITO','CCAF_AHORRO','CCAF_DENTAL','CCAF_SEG_VIDA','CCAF_OTROS','others']"/>
+                <t t-set="subtotal_cats" t-value="['GROSS','BRUTO','habIMP']"/>
+
+                <t t-set="plines" t-value="o.line_ids.filtered(lambda l: l.appears_on_payslip)"/>
+                <t t-set="hab_lines" t-value="plines.filtered(lambda l: l.category_id.code in hab_cats)"/>
+                <t t-set="ded_lines" t-value="plines.filtered(lambda l: l.category_id.code in ded_cats)"/>
+                <!-- Total Haberes = renta imponible (GROSS) + haberes no imponibles (habIMP) -->
+                <t t-set="total_haberes" t-value="sum(plines.filtered(lambda l: l.category_id.code == 'GROSS').mapped('total')) + sum(plines.filtered(lambda l: l.category_id.code == 'habIMP').mapped('total'))"/>
+                <t t-set="total_descuentos" t-value="sum(plines.filtered(lambda l: l.category_id.code == 'TOTAL_DESC').mapped('total'))"/>
+                <t t-set="nrows" t-value="max(len(hab_lines), len(ded_lines))"/>
+
+                <table class="table table-sm table-borderless" style="width:100%; table-layout:fixed;">
+                    <colgroup>
+                        <col style="width:30%;"/>  <!-- etiqueta haber -->
+                        <col style="width:18%;"/>  <!-- monto haber -->
+                        <col style="width:4%;"/>   <!-- separador -->
+                        <col style="width:30%;"/>  <!-- etiqueta descuento -->
+                        <col style="width:18%;"/>  <!-- monto descuento -->
+                    </colgroup>
+                    <thead class="o_black_border">
+                        <tr>
+                            <th id="haberes_header" colspan="2">HABERES</th>
+                            <th></th>
+                            <th id="descuentos_header" colspan="2">DESCUENTOS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payslip_lines">
+                        <t t-foreach="range(nrows)" t-as="i">
+                            <tr style="color:none">
+                                <!-- Columna HABERES -->
+                                <t t-if="i &lt; len(hab_lines)">
+                                    <t t-set="hl" t-value="hab_lines[i]"/>
+                                    <t t-set="h_style" t-value="'color:#875A7B;' if hl.category_id.code in subtotal_cats else ''"/>
+                                    <t t-set="h_class" t-value="'fw-bold' if hl.category_id.code in subtotal_cats else ''"/>
+                                    <td t-att-class="h_class" t-att-style="h_style"><span t-out="hl.name"/></td>
+                                    <td t-attf-class="text-end #{h_class}" t-att-style="h_style">
+                                        <span t-out="hl.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td/><td/>
+                                </t>
+
+                                <td/>
+
+                                <!-- Columna DESCUENTOS -->
+                                <t t-if="i &lt; len(ded_lines)">
+                                    <t t-set="dl" t-value="ded_lines[i]"/>
+                                    <t t-set="d_style" t-value="'color:#875A7B;' if dl.category_id.code in subtotal_cats else ''"/>
+                                    <t t-set="d_class" t-value="'fw-bold' if dl.category_id.code in subtotal_cats else ''"/>
+                                    <td t-att-class="d_class" t-att-style="d_style"><span t-out="dl.name"/></td>
+                                    <td t-attf-class="text-end #{d_class}" t-att-style="d_style">
+                                        <span t-out="dl.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td/><td/>
+                                </t>
+                            </tr>
+                        </t>
+                        <!-- Fila de cierre: TOTAL HABERES | TOTAL DESCUENTOS alineados -->
+                        <tr class="o_black_border" style="color:none">
+                            <td class="fw-bold" style="color:#875A7B;">TOTAL HABERES</td>
+                            <td class="text-end fw-bold" style="color:#875A7B;">
+                                <span t-out="total_haberes" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                            </td>
+                            <td/>
+                            <td class="fw-bold" style="color:#875A7B;">TOTAL DESCUENTOS</td>
+                            <td class="text-end fw-bold" style="color:#875A7B;">
+                                <span t-out="total_descuentos" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Líquido a recibir -->
+                <table class="table table-sm table-borderless" style="width:100%;">
+                    <tbody>
+                        <tr class="o_black_border">
+                            <td class="fw-bold" style="color:#875A7B; font-size:1.1rem;">LÍQUIDO A RECIBIR</td>
+                            <td class="text-end fw-bold" style="color:#875A7B; font-size:1.1rem;">
+                                <span t-out="o.net_wage" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="oe_structure"></div>
+            </div>
+        </xpath>
+
+        <!-- Quitar la línea "Pagar el xxx ..." (se reemplaza por LÍQUIDO A RECIBIR) -->
+        <xpath expr="//div[@id='to_pay']" position="replace">
+            <div id="to_pay"/>
+        </xpath>
+
         <xpath expr="//div[@id='to_pay']" position="after">
             <div id="signature_section" class="mt-5">
                <div class="row mt-5">

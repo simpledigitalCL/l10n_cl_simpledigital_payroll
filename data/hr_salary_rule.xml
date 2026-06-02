@@ -15,6 +15,11 @@
             <field name="code">APVC_T</field>
         </record>
 
+        <record id="hr_category_cuenta2" model="hr.salary.rule.category">
+            <field name="name">Cuenta 2 AFP</field>
+            <field name="code">CUENTA2</field>
+        </record>
+
         <record id="hr_no_imponible" model="hr.salary.rule.category">
             <field name="name">No Imponible</field>
             <field name="code">NOP_IMP</field>
@@ -336,8 +341,81 @@ result = (contract.movility or 0.0) * total_days / 30.0
 ]]>
             </field>
             <field name="appears_on_payslip">1</field>
-        </record>  
-        
+        </record>
+
+        <!-- Regla Asignación Familiar (LRE 2311 / Previred Campo 22) -->
+        <record id="hr_rule_asignacion_familiar" model="hr.salary.rule">
+            <field name="name">Asignación Familiar</field>
+            <field name="code">ASIG_FAM</field>
+            <field name="category_id" search="[('code','=','NOP_IMP')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">144</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = bool(contract.has_family_loads)
+        ]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+result = 0.0
+
+if contract.has_family_loads:
+    segment = (contract.family_loads_segment or 'a').upper()
+    if segment in ('A', 'B', 'C'):
+        indicator = payslip.env['previred.indicator'].sudo().search(
+            [('date', '<=', payslip.date_from)], order='date desc', limit=1)
+
+        if indicator:
+            valor_carga = 0.0
+            if segment == 'A':
+                valor_carga = indicator.tramo_a or 0.0
+            elif segment == 'B':
+                valor_carga = indicator.tramo_b or 0.0
+            elif segment == 'C':
+                valor_carga = indicator.tramo_c or 0.0
+
+            cargas_totales = (
+                (contract.family_simple_loads_count or 0)
+                + 2 * (contract.family_invalid_loads_count or 0)
+                + (contract.family_maternal_loads_count or 0)
+            )
+
+            if valor_carga > 0 and cargas_totales > 0:
+                # Días con remuneración imponible (asistencia + vacaciones)
+                asistencia_days = 0
+                vac_days = 0
+                for line in payslip.worked_days_line_ids:
+                    code = line.work_entry_type_id.code or ""
+                    if code == "WORK100":
+                        asistencia_days += line.number_of_days or 0
+                    elif code == "LEAVECL120":
+                        vac_days += line.number_of_days or 0
+
+                total_days = asistencia_days + vac_days
+                if total_days > 30:
+                    total_days = 30
+
+                absent_days = sum(
+                    l.number_of_days or 0
+                    for l in payslip.worked_days_line_ids
+                    if l.work_entry_type_id.code in ["LIC", "LEAVE90", "OUT"]
+                )
+                if total_days < 30:
+                    total_days += (30 - (vac_days + asistencia_days + absent_days))
+
+                # DFL N°150 art. 12: si total_days >= 25, asignación completa;
+                # si < 25, prorrateo proporcional sobre base 30.
+                if total_days >= 25:
+                    result = valor_carga * cargas_totales
+                else:
+                    result = valor_carga * cargas_totales * total_days / 30.0
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
         <!-- Gratificacion 47 -->
         <record id="hr_rule_gratification_47" model="hr.salary.rule">
             <field name="name">Gratificación Legal (Art. 47)</field>
@@ -927,7 +1005,8 @@ else:
     
     # Aplicar tasa de AFC Empleado
     tasa = indicator.plazo_indefinido_trabajador or 0.0
-    result = base_imponible * (tasa / 100.0)]]>
+    result = base_imponible * (tasa / 100.0)
+]]>
             </field>
         
             <field name="appears_on_payslip">1</field>
@@ -1039,6 +1118,26 @@ else:
     result = min(contract.cotizacion_apvc_empleador, indicator.tope_mensual_apv)]]>
             </field>
         
+            <field name="appears_on_payslip">1</field>
+        </record>
+
+        <!-- Regla de Cuenta 2 AFP (ahorro voluntario, descuento no imponible) -->
+        <record id="hr_rule_cuenta2" model="hr.salary.rule">
+            <field name="name">Cuenta 2 AFP</field>
+            <field name="code">CUENTA2</field>
+            <field name="category_id" search="[('code','=','CUENTA2')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">162</field>
+
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.has_cuenta2 and contract.cotizacion_cuenta2 and contract.cotizacion_cuenta2 > 0</field>
+
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+        <![CDATA[
+result = contract.cotizacion_cuenta2 or 0.0]]>
+            </field>
+
             <field name="appears_on_payslip">1</field>
         </record>
 
@@ -1526,12 +1625,18 @@ elif has_leave:
             total_impo = sum(l.total for l in lines if l.category_id and l.category_id.code == 'GROSS')
         renta_imponible = float(total_impo or 0.0)
         break
+
+    # Sin liquidación anterior válida (ej: primer mes del trabajador):
+    # usar el sueldo base del contrato como renta imponible para la licencia.
+    if not renta_imponible:
+        renta_imponible = float(contract.wage or 0.0)
+
+    # Igual que el Excel: en un mes con licencia el aporte empleador es solo SC2
+    # (porción de la licencia reconstruida sobre la renta del último mes / sueldo base).
     valor_afc_licencia = ((min(renta_imponible, indicator.tope_seguro_cesantia) / 30) * total_days) * (tasa/100)
-    valor_afc =  base_imponible * (tasa / 100.0)
-    result = valor_afc_licencia + valor_afc
+    result = valor_afc_licencia
 else:
     result = 0.0
-
 ]]>
             </field>
             <field name="appears_on_payslip">1</field>
@@ -1918,6 +2023,7 @@ afc = categories.get('AFC_T', 0.0)
 apvi = categories.get('APVI', 0.0)
 apvc_t = categories.get('APVC_T', 0.0)
 apvc_e = categories.get('APV_EMP', 0.0)
+cuenta2 = categories.get('CUENTA2', 0.0)
 impuesto = categories.get('RETENCION', 0.0)
 ccaf_credit = categories.get('CCAF_CREDITO', 0.0)
 ccaf_ahorro = categories.get('CCAF_AHORRO', 0.0)
@@ -1927,7 +2033,7 @@ ccaf_otros = categories.get('CCAF_OTROS', 0.0)
 anticipos_prestamos = categories.get('others', 0.0)
 
 result = int(round(
-    afp + salud + afc + apvi + apvc_t + apvc_e +
+    afp + salud + afc + apvi + apvc_t + apvc_e + cuenta2 +
     isapre_extra + impuesto + ccaf_credit + ccaf_dental + ccaf_seguro +
     ccaf_ahorro + ccaf_otros + anticipos_prestamos
 ))]]>

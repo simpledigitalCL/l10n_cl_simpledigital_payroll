@@ -323,6 +323,16 @@ class HrContractInherit(models.Model):
         help="Monto de la cotización para el Ahorro Previsional Voluntario Colectivo (APVC) - Empleador.",
     )
 
+    # Cuenta 2 AFP (ahorro voluntario en AFP del trabajador)
+    has_cuenta2 = fields.Boolean(
+        string="¿Tiene Cuenta 2 AFP?",
+        help="Indica si el trabajador realiza aportes voluntarios a su Cuenta 2 en la AFP.",
+    )
+    cotizacion_cuenta2 = fields.Monetary(
+        string="Cotización Cuenta 2 AFP",
+        help="Monto mensual del aporte voluntario del trabajador a su Cuenta 2 AFP.",
+    )
+
     # Subsidios
     has_empleo_joven = fields.Boolean(
         string="¿Tiene Subsidio Empleo Joven?",

@@ -124,6 +124,13 @@ class HrPayslip(models.Model):
         slip_end = datetime.combine(self.date_to, dt_time(23, 59, 59))
     
         if self.struct_id.name == "Nómina Chile":
+            # Excluir líneas de tipos de entrada archivados (ej: OVERTIME desde asistencias
+            # de QuickPass). Archivar el work.entry.type es suficiente para sacarlo de nómina.
+            lines = [
+                l for l in lines
+                if self.env['hr.work.entry.type'].browse(l.get('work_entry_type_id')).active
+            ]
+            
             out_days = 0
             if self.contract_id and self.contract_id.date_start:
                 contract_start = self.contract_id.date_start
@@ -135,8 +142,9 @@ class HrPayslip(models.Model):
             total_days_in_period = 30
             if self.contract_id and self.contract_id.date_end:
                 contract_end = self.contract_id.date_end
-                # Si el contrato termina dentro del período de la nómina
-                if self.date_from <= contract_end <= self.date_to:
+                # Solo "finiquito mid-month" si termina ANTES del último día del período.
+                # Si date_end == date_to el trabajador cubrió el mes completo → base 30.
+                if self.date_from <= contract_end < self.date_to:
                     # Calcular días trabajados desde inicio del período hasta fin de contrato
                     days_worked = (contract_end - max(self.date_from, self.contract_id.date_start)).days + 1
                     total_days_in_period = days_worked
@@ -246,16 +254,39 @@ class HrPayslip(models.Model):
                             vac_days += added
                         break
 
+            # --- SIM-261: divisor 31 en meses de 31 días con situación parcial ---
+            # Regla general: divisor = 30 (norma chilena), incluso si el mes tiene 31.
+            # Excepción (DFL): si el mes tiene 31 días reales Y hay situación parcial
+            # (licencia parcial, ingreso mid-month o finiquito mid-month), se usa base 31.
+            chile_divisor = 30.0
+            base_days = total_days_in_period
+
+            if actual_calendar_days == 31:
+                has_mid_month_entry = out_days > 0
+                has_mid_month_exit = bool(
+                    self.contract_id and self.contract_id.date_end
+                    and self.date_from <= self.contract_id.date_end < self.date_to
+                )
+                # Licencia parcial: hay licencia pero no cubre el mes completo
+                has_partial_license = 0 < lic_falt_days < actual_calendar_days
+
+                if has_mid_month_entry or has_mid_month_exit or has_partial_license:
+                    chile_divisor = 31.0
+                    if not has_mid_month_exit:
+                        # En entrada parcial o licencia parcial, base = 31 días reales.
+                        # En finiquito, base = days_worked ya fijado arriba.
+                        base_days = 31
+
             # --- Calcular asistencia ---
-            asistencia_dias = total_days_in_period - lic_falt_days - vac_days - out_days
+            asistencia_dias = base_days - lic_falt_days - vac_days - out_days
             if asistencia_dias < 0:
                 asistencia_dias = 0
-    
+
             # Buscar línea WORK100
             work100_line = next((l for l in lines if self.env['hr.work.entry.type'].browse(l.get('work_entry_type_id')).code == 'WORK100'), None)
             if work100_line:
                 work100_line['number_of_days'] = asistencia_dias
-                work100_line['amount'] = (self.contract_id.wage / 30.0) * asistencia_dias
+                work100_line['amount'] = (self.contract_id.wage / chile_divisor) * asistencia_dias
                 work100_line['number_of_hours'] = asistencia_dias * 8
             else:
                 # Crear la línea si no existe
@@ -266,7 +297,7 @@ class HrPayslip(models.Model):
                         'work_entry_type_id': work_type.id,
                         'number_of_days': asistencia_dias,
                         'number_of_hours': asistencia_dias * 8,
-                        'amount': (self.contract_id.wage / 30.0) * asistencia_dias,
+                        'amount': (self.contract_id.wage / chile_divisor) * asistencia_dias,
                     })
     
             # --- Corregir línea OUT ---

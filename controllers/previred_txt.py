@@ -449,37 +449,9 @@ class PreviredExportController(http.Controller):
             cargas_maternales = str(contract.family_maternal_loads_count or 0)
             cargas_invalidas = str(contract.family_invalid_loads_count or 0)
 
-            # Campo 22 — Monto en $ Asignación Familiar
-            asignacion_familiar = "0"
-            if contract.has_family_loads and tramo_asignacion_familiar in ['A', 'B', 'C']:
-                # Obtener el indicador previred más reciente para valores de cargas
-                previred_indicator = request.env['previred.indicator'].sudo().search([
-                    ('date', '<=', period_dt.date())
-                ], order='date desc', limit=1)
-                
-                if previred_indicator:
-                    # Obtener valor de carga según tramo
-                    if tramo_asignacion_familiar == 'A':
-                        valor_carga = previred_indicator.tramo_a or 0
-                    elif tramo_asignacion_familiar == 'B':
-                        valor_carga = previred_indicator.tramo_b or 0
-                    elif tramo_asignacion_familiar == 'C':
-                        valor_carga = previred_indicator.tramo_c or 0
-                    else:
-                        valor_carga = 0
-                    
-                    if valor_carga > 0:
-                        # Calcular cargas totales: CT = cargas simples + 2 × cargas inválidas + cargas maternales
-                        cargas_totales = (
-                            int(cargas_simples) + 
-                            (2 * int(cargas_invalidas)) + 
-                            int(cargas_maternales)
-                        )
-                        
-                        # Asignación Familiar = VC × CT
-                        if cargas_totales > 0:
-                            asignacion_familiar_amount = int(valor_carga * cargas_totales)
-                            asignacion_familiar = str(asignacion_familiar_amount)
+            # Campo 22 — Monto en $ Asignación Familiar (desde regla ASIG_FAM)
+            asignacion_familiar_line = payslip.line_ids.filtered(lambda l: l.code == 'ASIG_FAM')
+            asignacion_familiar = str(int(sum(asignacion_familiar_line.mapped('total')))) if asignacion_familiar_line else "0"
 
             # Campo 23 — Monto en $ Asignación Familiar Retroactiva
             asignacion_familiar_retroactiva = ""
@@ -511,8 +483,9 @@ class PreviredExportController(http.Controller):
             # Campo 29 — Cotización Seguro de Invalidez y Sobrevivencia (SIS)
             cotizacion_sis = self._get_payslip_lines(payslip, rule_codes=['SIS']) or ""
             
-            # Campo 30 — Cuenta de Ahorro Voluntario AFP (vacío por defecto)
-            ahorro_voluntario_afp = ""
+            # Campo 30 — Cuenta de Ahorro Voluntario AFP (Cuenta 2)
+            monto_cuenta2 = self._get_payslip_lines(payslip, rule_codes=['CUENTA2']) or 0
+            ahorro_voluntario_afp = str(int(monto_cuenta2)) if monto_cuenta2 > 0 else ""
 
             # Campo 31 — Renta Imponible Sustitutiva AFP (vacío por defecto)
             renta_imponible_sustitutiva = ""
@@ -661,7 +634,15 @@ class PreviredExportController(http.Controller):
 
             # Campo 70 — Cotización Fonasa
             if health_code == '07':
-                tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados + previred_indicator.ccaf_empleadores_afiliados) / 100
+                # SIM-263: si la empresa tiene CCAF, FONASA recibe solo su parte
+                # (fonasa_empleadores_afiliados, p.ej. 2,8%) y el resto (4,2%) lo
+                # recauda la CCAF. Sin CCAF, FONASA recibe el 7% completo
+                # (suma de ambas tasas).
+                _caja_ccaf = contract.employee_id.company_id.caja_compensacion or ""
+                if _caja_ccaf and _caja_ccaf != '00':
+                    tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados or 0) / 100
+                else:
+                    tasa_fonasa = ((previred_indicator.fonasa_empleadores_afiliados or 0) + (previred_indicator.ccaf_empleadores_afiliados or 0)) / 100
                 cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * tasa_fonasa
                 cotizacion_fonasa = int(round(cotizacion_fonasa))
             else:
@@ -937,20 +918,9 @@ class PreviredExportController(http.Controller):
                 # Si no está afiliado al seguro de cesantía, campo vacío
                 renta_imponible_seguro_cesantia = ""
 
-            # Campo 101 — Aporte Trabajador Seguro Cesantía
-            aporte_trabajador_cesantia = ""
-            # Permitir cálculo si afc_enrolled o afc_enrolled_trabajado es True
-            if contract.afc_enrolled_trabajador and renta_imponible_seguro_cesantia and renta_imponible_seguro_cesantia != "00000000":
-                renta_cesantia_int = int(renta_imponible_seguro_cesantia)
-                # Verificar tipo de contrato
-                contract_type = contract.contract_type_id.name.lower() if contract.contract_type_id else ""
-                if 'permanent' in contract_type or 'indefinido' in contract_type:
-                    # Contrato indefinido: 0,6% trabajador
-                    aporte_trabajador = round(renta_cesantia_int * 0.006)
-                    aporte_trabajador_cesantia = f"{aporte_trabajador:08d}"
-                else:
-                    # Contrato plazo fijo: 0% trabajador
-                    aporte_trabajador_cesantia = "00000000"
+            # Campo 101 — Aporte Trabajador Seguro Cesantía (AFC Trabajador)
+            # Centralizado: se toma directamente de la regla salarial AFC_T.
+            aporte_trabajador_cesantia = self._get_payslip_lines(payslip, ['AFC_T']) or ""
 
             # Campo 102 — Aporte Empleador Seguro Cesantía - CY
             """
@@ -1023,7 +993,12 @@ class PreviredExportController(http.Controller):
                     movimiento_personal = movement.code or "00"
                     fecha_desde = movement.date_from.strftime('%d-%m-%Y') if movement.date_from else ""
                     fecha_hasta = movement.date_to.strftime('%d-%m-%Y') if movement.date_to else ""
-                    tipo_linea = movement.tipo_linea or "1" 
+                    tipo_linea = movement.tipo_linea or "1"
+
+                    # SIM-262: la asignación familiar (campo 22) solo va en la línea
+                    # principal (tipo 0); no debe repetirse en las líneas de movimientos
+                    # de personal, ya que Previred la sumaría varias veces.
+                    asignacion_familiar = "0"
 
                     aditional_line = f"{rut_number};{verification_digit};{paternal_surname};{maternal_surname};{first_name};{previred_gender};{nationality};{payment_type};{period_from};{period_to};{pension_regime};{worker_type};{''};{tipo_linea};{movimiento_personal};{fecha_desde};{fecha_hasta};{tramo_asignacion_familiar};{cargas_simples};{cargas_maternales};{cargas_invalidas};{asignacion_familiar};{asignacion_familiar_retroactiva};{reintegro_cargas_familiares};{subsidio_empleo_joven};{''};{''};{''};{''};{''};{''};{tasa_pactada_sustitutiva};{aporte_indemnizacion_sustitutiva};{num_periodos_sustitutivos};{periodo_desde_sustitutivo};{periodo_hasta_sustitutivo};{puesto_trabajo_pesado};{porcentaje_trabajo_pesado};{cotizacion_trabajo_pesado};{codigo_institucion_apvi};{numero_contrato_apvi};{forma_pago_apvi};{''};{cotizacion_depositos_convenidos};{codigo_institucion_apvc};{numero_contrato_apvc};{forma_pago_apvc};{cotizacion_trabajador_apvc};{''};{rut_afiliado_voluntario};{dv_afiliado_voluntario};{''};{''};{nombres_afiliado_voluntario};{codigo_movimiento_afiliado_voluntario};{fecha_desde_afiliado_voluntario};{fecha_hasta_afiliado_voluntario};{codigo_afp_afiliado_voluntario};{monto_capitalizacion_voluntaria};{monto_ahorro_voluntario};{numero_periodos_cotizacion};{codigo_ex_caja_regimen};{''};{''};{cotizacion_obligatoria_ips};{renta_imponible_desahucio};{codigo_ex_caja_regimen_desahucio};{tasa_cotizacion_desahucio_ex_cajas};{cotizacion_desahucio};{''};{cotizacion_acc_trabajo_isl};{bonificacion_ley_15386};{descuento_cargas_familiares_ips};{bonos_gobierno};{codigo_institucion_salud};{numero_fun};{renta_imponible_isapre};{moneda_plan_isapre};{cotizacion_pactada};{cotizacion_obligatoria};{cotizacion_salud_adicional};{monto_ges};{codigo_ccaf};{''};{creditos_personales_ccaf};{codigo_ex_caja_regimen_ips};{descuentos_ccaf_leasing};{''};{cotizacion_ips_ex_caja};{''};{''};{''};{tipo_jornada};{''};{cotizacion_rentabilidad_protegida};{''};{''};{''};{''};{''};{''};{''};{rut_pagadora_subsidio};{dv_pagadora_subsidio};{centro_costos}"
                     lines.append(aditional_line)
@@ -1230,37 +1205,9 @@ class PreviredExportController(http.Controller):
             cargas_maternales = str(contract.family_maternal_loads_count or 0)
             cargas_invalidas = str(contract.family_invalid_loads_count or 0)
 
-            # Campo 22 — Monto en $ Asignación Familiar
-            asignacion_familiar = "0"
-            if contract.has_family_loads and tramo_asignacion_familiar in ['A', 'B', 'C']:
-                # Obtener el indicador previred más reciente para valores de cargas
-                previred_indicator = request.env['previred.indicator'].sudo().search([
-                    ('date', '<=', period_dt.date())
-                ], order='date desc', limit=1)
-                
-                if previred_indicator:
-                    # Obtener valor de carga según tramo
-                    if tramo_asignacion_familiar == 'A':
-                        valor_carga = previred_indicator.tramo_a or 0
-                    elif tramo_asignacion_familiar == 'B':
-                        valor_carga = previred_indicator.tramo_b or 0
-                    elif tramo_asignacion_familiar == 'C':
-                        valor_carga = previred_indicator.tramo_c or 0
-                    else:
-                        valor_carga = 0
-                    
-                    if valor_carga > 0:
-                        # Calcular cargas totales: CT = cargas simples + 2 × cargas inválidas + cargas maternales
-                        cargas_totales = (
-                            int(cargas_simples) + 
-                            (2 * int(cargas_invalidas)) + 
-                            int(cargas_maternales)
-                        )
-                        
-                        # Asignación Familiar = VC × CT
-                        if cargas_totales > 0:
-                            asignacion_familiar_amount = int(valor_carga * cargas_totales)
-                            asignacion_familiar = str(asignacion_familiar_amount)
+            # Campo 22 — Monto en $ Asignación Familiar (desde regla ASIG_FAM)
+            asignacion_familiar_line = payslip.line_ids.filtered(lambda l: l.code == 'ASIG_FAM')
+            asignacion_familiar = str(int(sum(asignacion_familiar_line.mapped('total')))) if asignacion_familiar_line else "0"
 
             # Campo 23 — Monto en $ Asignación Familiar Retroactiva
             asignacion_familiar_retroactiva = ""
@@ -1292,8 +1239,9 @@ class PreviredExportController(http.Controller):
             # Campo 29 — Cotización Seguro de Invalidez y Sobrevivencia (SIS)
             cotizacion_sis = self._get_payslip_lines(payslip, rule_codes=['SIS']) or ""
             
-            # Campo 30 — Cuenta de Ahorro Voluntario AFP (vacío por defecto)
-            ahorro_voluntario_afp = ""
+            # Campo 30 — Cuenta de Ahorro Voluntario AFP (Cuenta 2)
+            monto_cuenta2 = self._get_payslip_lines(payslip, rule_codes=['CUENTA2']) or 0
+            ahorro_voluntario_afp = str(int(monto_cuenta2)) if monto_cuenta2 > 0 else ""
 
             # Campo 31 — Renta Imponible Sustitutiva AFP (vacío por defecto)
             renta_imponible_sustitutiva = ""
@@ -1442,7 +1390,15 @@ class PreviredExportController(http.Controller):
 
             # Campo 70 — Cotización Fonasa
             if health_code == '07':
-                tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados + previred_indicator.ccaf_empleadores_afiliados) / 100
+                # SIM-263: si la empresa tiene CCAF, FONASA recibe solo su parte
+                # (fonasa_empleadores_afiliados, p.ej. 2,8%) y el resto (4,2%) lo
+                # recauda la CCAF. Sin CCAF, FONASA recibe el 7% completo
+                # (suma de ambas tasas).
+                _caja_ccaf = contract.employee_id.company_id.caja_compensacion or ""
+                if _caja_ccaf and _caja_ccaf != '00':
+                    tasa_fonasa = (previred_indicator.fonasa_empleadores_afiliados or 0) / 100
+                else:
+                    tasa_fonasa = ((previred_indicator.fonasa_empleadores_afiliados or 0) + (previred_indicator.ccaf_empleadores_afiliados or 0)) / 100
                 cotizacion_fonasa = min(self._get_payslip_lines(payslip, rule_codes=['GROSS']) or 0, previred_indicator.tope_afiliados_afp or 0) * tasa_fonasa
                 cotizacion_fonasa = int(round(cotizacion_fonasa))
             else:
@@ -1718,7 +1674,7 @@ class PreviredExportController(http.Controller):
                 # Si no está afiliado al seguro de cesantía, campo vacío
                 renta_imponible_seguro_cesantia = ""
 
-            # Campo 101 — Aporte Trabajador Seguro Cesantía
+            # Campo 101 — Aporte Trabajador Seguro Cesantía (AFC Trabajador)
             aporte_trabajador_cesantia = ""
             # Permitir cálculo si afc_enrolled o afc_enrolled_trabajado es True
             if contract.afc_enrolled_trabajador and renta_imponible_seguro_cesantia and renta_imponible_seguro_cesantia != "00000000":
@@ -1819,7 +1775,12 @@ class PreviredExportController(http.Controller):
                     movimiento_personal = movement.code or "00"
                     fecha_desde = movement.date_from.strftime('%d-%m-%Y') if movement.date_from else ""
                     fecha_hasta = movement.date_to.strftime('%d-%m-%Y') if movement.date_to else ""
-                    tipo_linea = movement.tipo_linea or "1" 
+                    tipo_linea = movement.tipo_linea or "1"
+
+                    # SIM-262: la asignación familiar (campo 22) solo va en la línea
+                    # principal (tipo 0); no debe repetirse en las líneas de movimientos
+                    # de personal, ya que Previred la sumaría varias veces.
+                    asignacion_familiar = "0"
 
                     additional_row = [
                         rut_number, verification_digit, paternal_surname, maternal_surname, first_name,
