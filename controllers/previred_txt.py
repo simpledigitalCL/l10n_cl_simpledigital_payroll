@@ -532,7 +532,7 @@ class PreviredExportController(http.Controller):
 
             # Campo 43 — Cotización APVI
             if contract.has_apvi:
-                monto_apvi = int(contract.cotizacion_apvi or 0)
+                monto_apvi = int(self._get_payslip_lines(payslip, rule_codes=['APVI']) or 0)
                 cotizacion_apvi = f"{monto_apvi:08d}" if monto_apvi > 0 else ""
             else:
                 cotizacion_apvi = ""
@@ -557,14 +557,14 @@ class PreviredExportController(http.Controller):
 
             # Campo 48 — Cotización Trabajador APVC (vacío por defecto)|
             if contract.has_apvc:
-                monto_apvc_trabajador = int(contract.cotizacion_apvc_trabajador or 0)
+                monto_apvc_trabajador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_T']) or 0)
                 cotizacion_trabajador_apvc = f"{monto_apvc_trabajador:08d}" if monto_apvc_trabajador > 0 else ""
             else:
                 cotizacion_trabajador_apvc = ""
 
             # Campo 49 — Cotización Empleador APVC (vacío por defecto)
             if contract.has_apvc:
-                monto_apvc_empleador = int(contract.cotizacion_apvc_empleador or 0)
+                monto_apvc_empleador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_E']) or 0)
                 cotizacion_empleador_apvc = f"{monto_apvc_empleador:08d}" if monto_apvc_empleador > 0 else ""
             else:
                 cotizacion_empleador_apvc = ""
@@ -744,14 +744,10 @@ class PreviredExportController(http.Controller):
             else:
                 renta_imponible_ccaf = ""
 
-            # Campo 85 — Cotización CCAF
-            ccaf_credits = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.remaining_installments > 0 and c.deduction_type == 'credit'
-            )
-            if ccaf_credits:
-                # Sumar todas las cuotas mensuales de créditos activos
-                total_installment = sum(ccaf_credits.mapped('installment_amount'))
-                creditos_personales_ccaf = f"{int(total_installment):08d}"
+            # Campo 85 — Cotización CCAF (desde regla CCAF_CREDITO)
+            total_ccaf_credito = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
+            if total_ccaf_credito > 0:
+                creditos_personales_ccaf = f"{int(total_ccaf_credito):08d}"
             else:
                 creditos_personales_ccaf = ""
 
@@ -759,25 +755,17 @@ class PreviredExportController(http.Controller):
             # TODO APLICAR PARA CAJA LOS HEROES
             codigo_ex_caja_regimen_ips = ""
 
-            # Campo 87 — Descuentos por Leasing
-            ccaf_leasing = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'leasing'
-            )
-            if ccaf_leasing:
-                # Sumar todas las cuotas mensuales de leasing activos
-                total_leasing = sum(ccaf_leasing.mapped('total_amount'))
-                descuentos_ccaf_leasing = f"{int(total_leasing):08d}"  
+            # Campo 87 — Descuentos por Leasing (desde regla CCAF_AHORRO)
+            total_ccaf_leasing = self._get_payslip_lines(payslip, rule_codes=['CCAF_AHORRO']) or 0
+            if total_ccaf_leasing > 0:
+                descuentos_ccaf_leasing = f"{int(total_ccaf_leasing):08d}"
             else:
                 descuentos_ccaf_leasing = ""
 
-            # Campo 88 — Descuentos por seguro de vida
-            ccaf_insurance = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'insurance'
-            )
-            if ccaf_insurance:
-                    # Sumar todas las cuotas mensuales de seguros activos
-                    total_insurance = sum(ccaf_insurance.mapped('total_amount'))
-                    renta_imponible_ips_ex_caja = f"{int(total_insurance):08d}"  
+            # Campo 88 — Descuentos por seguro de vida (desde regla CCAF_SEG_VIDA)
+            total_ccaf_seguro = self._get_payslip_lines(payslip, rule_codes=['CCAF_SEG_VIDA']) or 0
+            if total_ccaf_seguro > 0:
+                renta_imponible_ips_ex_caja = f"{int(total_ccaf_seguro):08d}"
             else:
                 renta_imponible_ips_ex_caja = ""
        
@@ -1288,7 +1276,7 @@ class PreviredExportController(http.Controller):
 
             # Campo 43 — Cotización APVI
             if contract.has_apvi:
-                monto_apvi = int(contract.cotizacion_apvi or 0)
+                monto_apvi = int(self._get_payslip_lines(payslip, rule_codes=['APVI']) or 0)
                 cotizacion_apvi = f"{monto_apvi:08d}" if monto_apvi > 0 else ""
             else:
                 cotizacion_apvi = ""
@@ -1313,14 +1301,14 @@ class PreviredExportController(http.Controller):
 
             # Campo 48 — Cotización Trabajador APVC (vacío por defecto)|
             if contract.has_apvc:
-                monto_apvc_trabajador = int(contract.cotizacion_apvc_trabajador or 0)
+                monto_apvc_trabajador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_T']) or 0)
                 cotizacion_trabajador_apvc = f"{monto_apvc_trabajador:08d}" if monto_apvc_trabajador > 0 else ""
             else:
                 cotizacion_trabajador_apvc = ""
 
             # Campo 49 — Cotización Empleador APVC (vacío por defecto)
             if contract.has_apvc:
-                monto_apvc_empleador = int(contract.cotizacion_apvc_empleador or 0)
+                monto_apvc_empleador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_E']) or 0)
                 cotizacion_empleador_apvc = f"{monto_apvc_empleador:08d}" if monto_apvc_empleador > 0 else ""
             else:
                 cotizacion_empleador_apvc = ""
@@ -1500,14 +1488,10 @@ class PreviredExportController(http.Controller):
             else:
                 renta_imponible_ccaf = ""
 
-            # Campo 85 — Cotización CCAF
-            ccaf_credits = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.remaining_installments > 0 and c.deduction_type == 'credit'
-            )
-            if ccaf_credits:
-                # Sumar todas las cuotas mensuales de créditos activos
-                total_installment = sum(ccaf_credits.mapped('installment_amount'))
-                creditos_personales_ccaf = f"{int(total_installment):08d}"
+            # Campo 85 — Cotización CCAF (desde regla CCAF_CREDITO)
+            total_ccaf_credito = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
+            if total_ccaf_credito > 0:
+                creditos_personales_ccaf = f"{int(total_ccaf_credito):08d}"
             else:
                 creditos_personales_ccaf = ""
 
@@ -1515,25 +1499,17 @@ class PreviredExportController(http.Controller):
             # TODO APLICAR PARA CAJA LOS HEROES
             codigo_ex_caja_regimen_ips = ""
 
-            # Campo 87 — Descuentos por Leasing
-            ccaf_leasing = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'leasing'
-            )
-            if ccaf_leasing:
-                # Sumar todas las cuotas mensuales de leasing activos
-                total_leasing = sum(ccaf_leasing.mapped('total_amount'))
-                descuentos_ccaf_leasing = f"{int(total_leasing):08d}"  
+            # Campo 87 — Descuentos por Leasing (desde regla CCAF_AHORRO)
+            total_ccaf_leasing = self._get_payslip_lines(payslip, rule_codes=['CCAF_AHORRO']) or 0
+            if total_ccaf_leasing > 0:
+                descuentos_ccaf_leasing = f"{int(total_ccaf_leasing):08d}"
             else:
                 descuentos_ccaf_leasing = ""
 
-            # Campo 88 — Descuentos por seguro de vida
-            ccaf_insurance = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'insurance'
-            )
-            if ccaf_insurance:
-                    # Sumar todas las cuotas mensuales de seguros activos
-                    total_insurance = sum(ccaf_insurance.mapped('total_amount'))
-                    renta_imponible_ips_ex_caja = f"{int(total_insurance):08d}"  
+            # Campo 88 — Descuentos por seguro de vida (desde regla CCAF_SEG_VIDA)
+            total_ccaf_seguro = self._get_payslip_lines(payslip, rule_codes=['CCAF_SEG_VIDA']) or 0
+            if total_ccaf_seguro > 0:
+                renta_imponible_ips_ex_caja = f"{int(total_ccaf_seguro):08d}"
             else:
                 renta_imponible_ips_ex_caja = ""
        
