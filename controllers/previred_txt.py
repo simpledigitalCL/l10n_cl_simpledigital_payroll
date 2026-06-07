@@ -824,32 +824,12 @@ class PreviredExportController(http.Controller):
             else:
                 tipo_jornada = "0"
 
-            # Campo 94 — Cotización Expectativa de Vida - Monto en $ de cotización aporte empleador - CQ - Seguro de social
-            if afp_code != "00" and contract.pension_option == "afp": 
-                expectativa_vida = previred_indicator.expectativa_vida / 100
-                renta_imponible_valor = renta_imponible('afp')
-                tiene_licencia = False
-                
-                if hasattr(payslip, 'previred_movement_ids'):
-                    employee_movements = payslip.previred_movement_ids
-                    for movement in employee_movements:
-                        if movement.code in ["3", "6"]:
-                            tiene_licencia = True
-                            break
-                
-                if tiene_licencia:
-                    dias_licencia = self._calculate_license_days(payslip)
-
-                    # Si tiene licencia del mes completo usa el completo del RIMA (Renta Imponible Mes Anterior)
-                    if dias_licencia >= 30:
-                        cotizacion_expectativa_vida = round(float(renta_imponible_licencia) * expectativa_vida)
-                    else:
-                        # Si no es mes completo, usa la suma de lo trabajado + RIMA proporcional
-                        rima_proporcional = round((float(renta_imponible_licencia) / 30) * dias_licencia)   
-                        print( "RIMA Proporcional:", rima_proporcional )     
-                        cotizacion_expectativa_vida = round((renta_imponible_valor + rima_proporcional) * expectativa_vida)
-                else:
-                    cotizacion_expectativa_vida = round(renta_imponible_valor * expectativa_vida)
+            # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
+            # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
+            # recalcularlo aquí, para que TXT y liquidación queden siempre consistentes.
+            if afp_code != "00" and contract.pension_option == "afp":
+                total_exp_vida = self._get_payslip_lines(payslip, rule_codes=['EXP_VIDA']) or 0
+                cotizacion_expectativa_vida = int(round(total_exp_vida))
             else:
                 cotizacion_expectativa_vida = "0"
 
@@ -1488,12 +1468,10 @@ class PreviredExportController(http.Controller):
             else:
                 renta_imponible_ccaf = ""
 
-            # Campo 85 — Cotización CCAF (desde regla CCAF_CREDITO)
-            total_ccaf_credito = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
-            if total_ccaf_credito > 0:
-                creditos_personales_ccaf = f"{int(total_ccaf_credito):08d}"
-            else:
-                creditos_personales_ccaf = ""
+            # Campo 85 — Cotización CCAF: se omite en las líneas de movimiento (SIM-267)
+            # El crédito CCAF ya se informa en la línea principal del trabajador; repetirlo
+            # en cada línea de movimiento de personal lo duplica en Previred.
+            creditos_personales_ccaf = ""
 
             # Campo 86 — Descuento Dental CCAF
             # TODO APLICAR PARA CAJA LOS HEROES
@@ -1568,32 +1546,12 @@ class PreviredExportController(http.Controller):
             else:
                 tipo_jornada = "0"
 
-            # Campo 94 — Cotización Expectativa de Vida - Monto en $ de cotización aporte empleador - CQ - Seguro de social
-            if afp_code != "00" and contract.pension_option == "afp": 
-                expectativa_vida = previred_indicator.expectativa_vida / 100
-                renta_imponible_valor = renta_imponible('afp')
-                tiene_licencia = False
-                
-                if hasattr(payslip, 'previred_movement_ids'):
-                    employee_movements = payslip.previred_movement_ids
-                    for movement in employee_movements:
-                        if movement.code in ["3", "6"]:
-                            tiene_licencia = True
-                            break
-                
-                if tiene_licencia:
-                    dias_licencia = self._calculate_license_days(payslip)
-
-                    # Si tiene licencia del mes completo usa el completo del RIMA (Renta Imponible Mes Anterior)
-                    if dias_licencia >= 30:
-                        cotizacion_expectativa_vida = round(float(renta_imponible_licencia) * expectativa_vida)
-                    else:
-                        # Si no es mes completo, usa la suma de lo trabajado + RIMA proporcional
-                        rima_proporcional = round((float(renta_imponible_licencia) / 30) * dias_licencia)   
-                        print( "RIMA Proporcional:", rima_proporcional )     
-                        cotizacion_expectativa_vida = round((renta_imponible_valor + rima_proporcional) * expectativa_vida)
-                else:
-                    cotizacion_expectativa_vida = round(renta_imponible_valor * expectativa_vida)
+            # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
+            # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
+            # recalcularlo aquí, para que TXT y liquidación queden siempre consistentes.
+            if afp_code != "00" and contract.pension_option == "afp":
+                total_exp_vida = self._get_payslip_lines(payslip, rule_codes=['EXP_VIDA']) or 0
+                cotizacion_expectativa_vida = int(round(total_exp_vida))
             else:
                 cotizacion_expectativa_vida = "0"
 
