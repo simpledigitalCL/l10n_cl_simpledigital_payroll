@@ -876,20 +876,10 @@ class PreviredExportController(http.Controller):
                 codigo_mutualidad = "00"  
 
             # Campo 97 – Renta Imponible Mutual
-            if codigo_mutualidad != "00":
-                dias_licencia = self._calculate_license_days(payslip)
-                if dias_licencia >= 30:
-                    renta_imponible_mutual = self._calculate_renta_imponible_last_month(employee, contract, period_dt)
-                else:
-                    renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
-            else:
-                renta_imponible_mutual = ""
+            renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
             
             # Campo 98 – Cotización por Accidente del Trabajo (MUTUAL)
-            if codigo_mutualidad != "00":
-                cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
-            else:
-                cotizacion_accidente_trabajo_mutual = ""
+            cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
 
             # Campo 99 — Sucursal para pago Mutual 
             campo_adicional_99 = ""
@@ -1632,20 +1622,10 @@ class PreviredExportController(http.Controller):
                 codigo_mutualidad = "00"  
 
             # Campo 97 – Renta Imponible Mutual
-            if codigo_mutualidad != "00":
-                dias_licencia = self._calculate_license_days(payslip)
-                if dias_licencia >= 30:
-                    renta_imponible_mutual = self._calculate_renta_imponible_last_month(employee, contract, period_dt)
-                else:
-                    renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
-            else:
-                renta_imponible_mutual = ""
+            renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
             
             # Campo 98 – Cotización por Accidente del Trabajo (MUTUAL)
-            if codigo_mutualidad != "00":
-                cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
-            else:
-                cotizacion_accidente_trabajo_mutual = ""
+            cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
 
             # Campo 99 — Sucursal para pago Mutual 
             campo_adicional_99 = ""
