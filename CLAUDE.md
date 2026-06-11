@@ -8,6 +8,8 @@ Odoo 18 module for Chilean payroll (`l10n_cl_simpledigital_payroll`). Handles AF
 
 ## Deployment (GCP)
 
+> **Full deploy guide: [`docs/DEPLOY.md`](docs/DEPLOY.md)** — read it before touching production. It covers the infra map (which service/copy serves each DB), the two module copies (`custom_addons` vs `/opt/rrhh`), and the SyS gotcha. The summary below is the quick reference.
+
 **Server**: `odoo-new`, zone `us-central1-c`, project `stepsconsulting`  
 **Active service**: `odoo18-admin.service` (port 8068, config `/etc/odoo18-admin.conf`)  
 **Module path on server**: `/opt/odoo18/custom_addons/l10n_cl_simpledigital_payroll`  

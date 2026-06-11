@@ -164,60 +164,41 @@ class LibroRemuneracionesController(http.Controller):
         """
         return self._get_days_by_work_entry_code(payslip, "LEAVECL120")
 
-    def _calculate_overtime_salary(self, payslip, contract):
+    def _get_movement_rule_codes(self, name_keywords):
         """
-            Calcular el sobresueldo para el campo 41 (2102 Sobresueldo):
-            1. Utiliza las horas extras pactadas del contrato con la fórmula:
-            (contract.wage / 30 / 8) * 1.5 * contract.extra_hours
-            2. Utiliza horas extras no pactadas del tipo de movimiento "Horas extras no pactadas" formula:
-            (contract.wage / 30 / 8) * 1.5 * hours o (contract.hourly_wage * 1.5 * hours)
+        Devuelve los códigos de regla salarial (MOV_<id>) de los tipos de movimiento
+        cuyo nombre contiene alguno de los keywords dados.
+
+        Cada hr.employee.movement.type auto-genera una regla salarial MOV_<id> que ya
+        suma sus montos en la liquidación (ver models/hr_employee_movement.py). Esto
+        permite que el LRE sume esas líneas de regla -en lugar de releer los movimientos
+        en crudo- junto con la regla base correspondiente.
         """
         try:
-            if not contract:
-                _logger.warning(f"No hay contrato para payslip {payslip.id}")
-                return 0
-            
-            total_overtime = 0.0
-            
-            # PARTE 1: Calcular horas extras pactadas del contrato
-            if (hasattr(contract, 'has_extra_hours') and contract.has_extra_hours and
-                hasattr(contract, 'extra_hours') and contract.extra_hours and contract.extra_hours > 0):
-                
-                # Obtener valores del contrato
-                wage = contract.wage or 0
-                extra_hours_pactadas = contract.extra_hours or 0
-                
-                if wage > 0:
-                    # Aplicar la fórmula: (wage / 30 / 8) * 1.5 * extra_hours
-                    valor_hora_base = wage *  0.0079545
-                    valor_hora_extra = valor_hora_base * 1.5
-                    sobresueldo_pactado = valor_hora_extra * extra_hours_pactadas
-                    total_overtime += sobresueldo_pactado
-            
-            # PARTE 2: Buscar horas extras no pactadas en movimientos del empleado
-            employee = payslip.employee_id
-            from_date = payslip.date_from
-            to_date = payslip.date_to
-            
-            # Buscar líneas de movimientos que contengan "horas extras" no pactadas
-            overtime_lines = request.env['hr.employee.movement.line'].sudo().search([
-                ('employee_id', '=', employee.id),
-                ('movement_id.date', '>=', from_date),
-                ('movement_id.date', '<=', to_date),
-                '|',
-                ('movement_type_id.name', 'ilike', 'horas extras'),
-                ('movement_type_id.name', 'ilike', 'extra'),
-            ])
-            
-            for line in overtime_lines:
-                if line.amount and line.amount > 0:
-                    total_overtime += line.amount
-            
-            return int(total_overtime)
-                
+            if not name_keywords:
+                return []
+            domain = ['|'] * (len(name_keywords) - 1)
+            for kw in name_keywords:
+                domain.append(('name', 'ilike', kw))
+            types = request.env['hr.employee.movement.type'].sudo().search(domain)
+            return [t.salary_rule_id.code for t in types if t.salary_rule_id and t.salary_rule_id.code]
         except Exception as e:
-            _logger.error(f"Error calculando sobresueldo para payslip {payslip.id}: {str(e)}")
-            return 0  
+            _logger.error(f"Error obteniendo códigos de regla de movimiento {name_keywords}: {str(e)}")
+            return []
+
+    def _calculate_overtime_salary(self, payslip, contract):
+        """
+        Campo 41 (2102 Sobresueldo): suma de las líneas de regla salarial de horas extras.
+
+        Fuente única = reglas salariales ya presentes en la liquidación:
+          - HE            -> horas extras pactadas del contrato
+          - MOV_<id>      -> tipos de movimiento de horas extras no pactadas
+
+        Se leen las líneas de la liquidación (no se recalcula), por lo que el monto coincide
+        exactamente con lo computado en el líquido y refleja cualquier ajuste a la regla.
+        """
+        codes = ["HE"] + self._get_movement_rule_codes(['horas extras', 'extra'])
+        return int(self._get_payslip_lines(payslip, codes) or 0)
 
     def _calculate_commissions(self, payslip):
         """
@@ -306,39 +287,17 @@ class LibroRemuneracionesController(http.Controller):
 
     def _calculate_viaticos(self, payslip):
         """
-        Calcular viáticos para el campo 71 (2303 Viáticos total mensual):
-        Busca movimientos del empleado que contengan "Viatico" en el nombre, tipo de movimiento o descripción
-        para el período de la liquidación
+        Campo 71 (2303 Viáticos total mensual): suma de las líneas de regla salarial de viáticos.
+
+        Fuente única = reglas salariales ya presentes en la liquidación:
+          - VIATICO_FIJO  -> viático fijo del contrato
+          - MOV_<id>      -> tipos de movimiento de viáticos
+
+        Se leen las líneas de la liquidación (no se recalcula), evitando doble conteo con las
+        reglas MOV_<id> que ya suman los movimientos en el líquido.
         """
-        try:
-            employee = payslip.employee_id
-            from_date = payslip.date_from
-            to_date = payslip.date_to
-            contract = payslip.contract_id if hasattr(payslip, 'contract_id') else None
-
-            # Buscar líneas de movimientos que contengan "viatico" o "viaticos" en el tipo de movimiento
-            lines = request.env['hr.employee.movement.line'].sudo().search([
-                ('employee_id', '=', employee.id),
-                ('movement_id.date', '>=', from_date),
-                ('movement_id.date', '<=', to_date),
-                '|',
-                ('movement_type_id.name', 'ilike', 'viatico'),
-                ('movement_type_id.name', 'ilike', 'viaticos'),
-            ])
-
-            total_viaticos = 0.0
-
-            for line in lines:
-                total_viaticos += line.amount or 0.0
-
-            # Sumar viático fijo del contrato si existe y es mayor a 0
-            if contract and hasattr(contract, 'viatico_fijo') and contract.viatico_fijo and contract.viatico_fijo > 0:
-                total_viaticos += contract.viatico_fijo
-
-            return int(total_viaticos)
-
-        except Exception as e:
-            return 0
+        codes = ["VIATICO_FIJO"] + self._get_movement_rule_codes(['viatico'])
+        return int(self._get_payslip_lines(payslip, codes) or 0)
 
     def _get_previred_indicator_value(self, payslip, field_name):
         """Return a field from previred.indicator for the payslip month."""
@@ -438,81 +397,25 @@ class LibroRemuneracionesController(http.Controller):
     def _get_ccaf_credit_deduction(self, payslip):
         """
             Campo 3110 - Crédito social CCAF
-            Retorna el monto total en pesos correspondiente a créditos sociales activos
-            del trabajador durante el período del payslip. Usando el modelo hr.ccaf.deduction
-            1. Filtra las deducciones de tipo 'credit' y activas 
-            2. Filtrar las deduciones de tipo 'insurance' y activas
+            Fuente: reglas salariales CCAF_CREDITO (crédito social) + CCAF_SEG_VIDA (seguro de vida).
+            La regla salarial es la única fuente de verdad; así un ajuste en la regla se refleja
+            automáticamente en el LRE y en el TXT de Previred.
         """
-        employee = payslip.employee_id
-        if not employee:
-            return 0
+        return int(round(self._get_payslip_lines(payslip, ["CCAF_CREDITO", "CCAF_SEG_VIDA"]) or 0))
 
-        # Créditos sociales: tipo 'credit', activos, con cuotas restantes
-        credit_deductions = request.env['hr.ccaf.deduction'].search([
-            ('employee_id', '=', employee.id),
-            ('deduction_type', '=', 'credit'),
-            ('active', '=', True),
-            ('start_date', '<=', payslip.date_to),
-            ('remaining_installments', '>', 0),
-        ])
-        total_ccaf_credit = sum(d.installment_amount for d in credit_deductions)
-
-        # Seguros de vida: tipo 'insurance', activos
-        insurance_deductions = request.env['hr.ccaf.deduction'].search([
-            ('employee_id', '=', employee.id),
-            ('deduction_type', '=', 'insurance'),
-            ('active', '=', True),
-        ])
-        total_insurance = sum(d.total_amount for d in insurance_deductions)
-
-        return int(round(total_ccaf_credit + total_insurance))
-    
     def _get_ccaf_credit_saving (self, payslip):
         """
-            Campo 119 - 3182 Crédito cooperativas de ahorro 
-            Retorna el monto total en pesos correspondiente a ahorros previsionales voluntarios
-            del trabajador durante el período del payslip. Usando el modelo hr.ccaf.deduction
-            1. Filtra los ahorros de tipo 'leasing' y activos
+            Campo 119 - 3182 Crédito cooperativas de ahorro
+            Fuente: regla salarial CCAF_AHORRO (programa de ahorro / leasing).
         """
-        employee = payslip.employee_id
-        if not employee:
-            return 0
+        return int(round(self._get_payslip_lines(payslip, ["CCAF_AHORRO"]) or 0))
 
-        # Filtrar solo ahorros de tipo 'voluntary' y activos
-        deductions = request.env['hr.ccaf.deduction'].search([
-            ('employee_id', '=', employee.id),
-            ('deduction_type', '=', 'leasing'),
-            ('active', '=', True),
-        ])
-
-        # Sumar los montos de ahorro (amount)
-        total_ccaf_saving = sum(d.total_amount for d in deductions)
-
-        return int(round(total_ccaf_saving))
-    
     def _get_ccaf_credit_others(self, payslip):
         """
             Campo 3183 - Otros créditos CCAF
-            Retorna el monto total en pesos correspondiente a otros créditos activos
-            del trabajador durante el período del payslip. Usando el modelo hr.ccaf.deduction
-            1. Filtra las deducciones de tipo 'other' y activas
+            Fuente: regla salarial CCAF_OTROS.
         """
-        employee = payslip.employee_id
-        if not employee:
-            return 0
-
-        # Filtrar solo deducciones de tipo 'other' y activas
-        deductions = request.env['hr.ccaf.deduction'].search([
-            ('employee_id', '=', employee.id),
-            ('deduction_type', '=', 'other'),
-            ('active', '=', True),
-            ('start_date', '<=', payslip.date_to),
-        ])
-
-        # Sumar los montos de otras deducciones (amount)
-        total_ccaf_other = sum(d.total_amount for d in deductions)
-
-        return int(round(total_ccaf_other))
+        return int(round(self._get_payslip_lines(payslip, ["CCAF_OTROS"]) or 0))
 
     def _get_descuentos_anticipos_prestamos(self, payslip):
         """
@@ -966,7 +869,8 @@ class LibroRemuneracionesController(http.Controller):
         sueldo_empresarial = 0
 
         # Campo 65 - 2201 Subsidio por incapacidad laboral por licencia médica - total mensual Int 8 OPCIONAL
-        subsidio_incapacidad_laboral = 0
+        # Fuente: regla salarial SUBSIDIO (monto que paga la institución de salud por licencia).
+        subsidio_incapacidad_laboral = self._get_payslip_lines(payslip, ["SUBSIDIO"]) or 0
 
         # Campo 66 - 2202 Beca de estudio (Art. 17 N°18 LIR) Int 8 OPCIONAL
         beca_estudio = 0

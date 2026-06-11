@@ -400,9 +400,9 @@ class PreviredExportController(http.Controller):
 
             # Campo 12 — Tipo de Trabajador
             worker_type = '0'
-            # Tipo 2: Pensionado mayor de 65 años sin cotización AFP
-            if  contract.is_retired_elderly:
-                worker_type = '2'
+            # Pensionado: tipo 2 si no cotiza (Sin Institución Previsional), tipo 1 si cotiza (AFP/IPS)
+            if contract.is_retired_elderly:
+                worker_type = '2' if contract.pension_option == 'sip' else '1'
             elif employee.birthday:
                 today = period_dt.date()
                 age = today.year - employee.birthday.year - ((today.month, today.day) < (employee.birthday.month, employee.birthday.day))
@@ -532,7 +532,7 @@ class PreviredExportController(http.Controller):
 
             # Campo 43 — Cotización APVI
             if contract.has_apvi:
-                monto_apvi = int(contract.cotizacion_apvi or 0)
+                monto_apvi = int(self._get_payslip_lines(payslip, rule_codes=['APVI']) or 0)
                 cotizacion_apvi = f"{monto_apvi:08d}" if monto_apvi > 0 else ""
             else:
                 cotizacion_apvi = ""
@@ -557,14 +557,14 @@ class PreviredExportController(http.Controller):
 
             # Campo 48 — Cotización Trabajador APVC (vacío por defecto)|
             if contract.has_apvc:
-                monto_apvc_trabajador = int(contract.cotizacion_apvc_trabajador or 0)
+                monto_apvc_trabajador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_T']) or 0)
                 cotizacion_trabajador_apvc = f"{monto_apvc_trabajador:08d}" if monto_apvc_trabajador > 0 else ""
             else:
                 cotizacion_trabajador_apvc = ""
 
             # Campo 49 — Cotización Empleador APVC (vacío por defecto)
             if contract.has_apvc:
-                monto_apvc_empleador = int(contract.cotizacion_apvc_empleador or 0)
+                monto_apvc_empleador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_E']) or 0)
                 cotizacion_empleador_apvc = f"{monto_apvc_empleador:08d}" if monto_apvc_empleador > 0 else ""
             else:
                 cotizacion_empleador_apvc = ""
@@ -744,40 +744,24 @@ class PreviredExportController(http.Controller):
             else:
                 renta_imponible_ccaf = ""
 
-            # Campo 85 — Cotización CCAF
-            ccaf_credits = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.remaining_installments > 0 and c.deduction_type == 'credit'
-            )
-            if ccaf_credits:
-                # Sumar todas las cuotas mensuales de créditos activos
-                total_installment = sum(ccaf_credits.mapped('installment_amount'))
-                creditos_personales_ccaf = f"{int(total_installment):08d}"
-            else:
-                creditos_personales_ccaf = ""
+            # Campo 85 — Cotización CCAF (desde regla CCAF_CREDITO)
+            creditos_personales_ccaf = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
 
             # Campo 86 — Descuento Dental CCAF
             # TODO APLICAR PARA CAJA LOS HEROES
             codigo_ex_caja_regimen_ips = ""
 
-            # Campo 87 — Descuentos por Leasing
-            ccaf_leasing = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'leasing'
-            )
-            if ccaf_leasing:
-                # Sumar todas las cuotas mensuales de leasing activos
-                total_leasing = sum(ccaf_leasing.mapped('total_amount'))
-                descuentos_ccaf_leasing = f"{int(total_leasing):08d}"  
+            # Campo 87 — Descuentos por Leasing (desde regla CCAF_AHORRO)
+            total_ccaf_leasing = self._get_payslip_lines(payslip, rule_codes=['CCAF_AHORRO']) or 0
+            if total_ccaf_leasing > 0:
+                descuentos_ccaf_leasing = f"{int(total_ccaf_leasing):08d}"
             else:
                 descuentos_ccaf_leasing = ""
 
-            # Campo 88 — Descuentos por seguro de vida
-            ccaf_insurance = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'insurance'
-            )
-            if ccaf_insurance:
-                    # Sumar todas las cuotas mensuales de seguros activos
-                    total_insurance = sum(ccaf_insurance.mapped('total_amount'))
-                    renta_imponible_ips_ex_caja = f"{int(total_insurance):08d}"  
+            # Campo 88 — Descuentos por seguro de vida (desde regla CCAF_SEG_VIDA)
+            total_ccaf_seguro = self._get_payslip_lines(payslip, rule_codes=['CCAF_SEG_VIDA']) or 0
+            if total_ccaf_seguro > 0:
+                renta_imponible_ips_ex_caja = f"{int(total_ccaf_seguro):08d}"
             else:
                 renta_imponible_ips_ex_caja = ""
        
@@ -836,32 +820,12 @@ class PreviredExportController(http.Controller):
             else:
                 tipo_jornada = "0"
 
-            # Campo 94 — Cotización Expectativa de Vida - Monto en $ de cotización aporte empleador - CQ - Seguro de social
-            if afp_code != "00" and contract.pension_option == "afp": 
-                expectativa_vida = previred_indicator.expectativa_vida / 100
-                renta_imponible_valor = renta_imponible('afp')
-                tiene_licencia = False
-                
-                if hasattr(payslip, 'previred_movement_ids'):
-                    employee_movements = payslip.previred_movement_ids
-                    for movement in employee_movements:
-                        if movement.code in ["3", "6"]:
-                            tiene_licencia = True
-                            break
-                
-                if tiene_licencia:
-                    dias_licencia = self._calculate_license_days(payslip)
-
-                    # Si tiene licencia del mes completo usa el completo del RIMA (Renta Imponible Mes Anterior)
-                    if dias_licencia >= 30:
-                        cotizacion_expectativa_vida = round(float(renta_imponible_licencia) * expectativa_vida)
-                    else:
-                        # Si no es mes completo, usa la suma de lo trabajado + RIMA proporcional
-                        rima_proporcional = round((float(renta_imponible_licencia) / 30) * dias_licencia)   
-                        print( "RIMA Proporcional:", rima_proporcional )     
-                        cotizacion_expectativa_vida = round((renta_imponible_valor + rima_proporcional) * expectativa_vida)
-                else:
-                    cotizacion_expectativa_vida = round(renta_imponible_valor * expectativa_vida)
+            # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
+            # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
+            # recalcularlo aquí, para que TXT y liquidación queden siempre consistentes.
+            if afp_code != "00" and contract.pension_option == "afp":
+                total_exp_vida = self._get_payslip_lines(payslip, rule_codes=['EXP_VIDA']) or 0
+                cotizacion_expectativa_vida = int(round(total_exp_vida))
             else:
                 cotizacion_expectativa_vida = "0"
 
@@ -1146,9 +1110,9 @@ class PreviredExportController(http.Controller):
 
             # Campo 12 — Tipo de Trabajador
             worker_type = '0'
-            # Tipo 2: Pensionado mayor de 65 años sin cotización AFP
-            if  contract.is_retired_elderly:
-                worker_type = '2'
+            # Pensionado: tipo 2 si no cotiza (Sin Institución Previsional), tipo 1 si cotiza (AFP/IPS)
+            if contract.is_retired_elderly:
+                worker_type = '2' if contract.pension_option == 'sip' else '1'
             elif employee.birthday:
                 today = period_dt.date()
                 age = today.year - employee.birthday.year - ((today.month, today.day) < (employee.birthday.month, employee.birthday.day))
@@ -1278,7 +1242,7 @@ class PreviredExportController(http.Controller):
 
             # Campo 43 — Cotización APVI
             if contract.has_apvi:
-                monto_apvi = int(contract.cotizacion_apvi or 0)
+                monto_apvi = int(self._get_payslip_lines(payslip, rule_codes=['APVI']) or 0)
                 cotizacion_apvi = f"{monto_apvi:08d}" if monto_apvi > 0 else ""
             else:
                 cotizacion_apvi = ""
@@ -1303,14 +1267,14 @@ class PreviredExportController(http.Controller):
 
             # Campo 48 — Cotización Trabajador APVC (vacío por defecto)|
             if contract.has_apvc:
-                monto_apvc_trabajador = int(contract.cotizacion_apvc_trabajador or 0)
+                monto_apvc_trabajador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_T']) or 0)
                 cotizacion_trabajador_apvc = f"{monto_apvc_trabajador:08d}" if monto_apvc_trabajador > 0 else ""
             else:
                 cotizacion_trabajador_apvc = ""
 
             # Campo 49 — Cotización Empleador APVC (vacío por defecto)
             if contract.has_apvc:
-                monto_apvc_empleador = int(contract.cotizacion_apvc_empleador or 0)
+                monto_apvc_empleador = int(self._get_payslip_lines(payslip, rule_codes=['APVC_E']) or 0)
                 cotizacion_empleador_apvc = f"{monto_apvc_empleador:08d}" if monto_apvc_empleador > 0 else ""
             else:
                 cotizacion_empleador_apvc = ""
@@ -1490,40 +1454,26 @@ class PreviredExportController(http.Controller):
             else:
                 renta_imponible_ccaf = ""
 
-            # Campo 85 — Cotización CCAF
-            ccaf_credits = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.remaining_installments > 0 and c.deduction_type == 'credit'
-            )
-            if ccaf_credits:
-                # Sumar todas las cuotas mensuales de créditos activos
-                total_installment = sum(ccaf_credits.mapped('installment_amount'))
-                creditos_personales_ccaf = f"{int(total_installment):08d}"
-            else:
-                creditos_personales_ccaf = ""
+            # Campo 85 — Cotización CCAF: se omite en las líneas de movimiento (SIM-267)
+            # El crédito CCAF ya se informa en la línea principal del trabajador; repetirlo
+            # en cada línea de movimiento de personal lo duplica en Previred.
+            creditos_personales_ccaf = ""
 
             # Campo 86 — Descuento Dental CCAF
             # TODO APLICAR PARA CAJA LOS HEROES
             codigo_ex_caja_regimen_ips = ""
 
-            # Campo 87 — Descuentos por Leasing
-            ccaf_leasing = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'leasing'
-            )
-            if ccaf_leasing:
-                # Sumar todas las cuotas mensuales de leasing activos
-                total_leasing = sum(ccaf_leasing.mapped('total_amount'))
-                descuentos_ccaf_leasing = f"{int(total_leasing):08d}"  
+            # Campo 87 — Descuentos por Leasing (desde regla CCAF_AHORRO)
+            total_ccaf_leasing = self._get_payslip_lines(payslip, rule_codes=['CCAF_AHORRO']) or 0
+            if total_ccaf_leasing > 0:
+                descuentos_ccaf_leasing = f"{int(total_ccaf_leasing):08d}"
             else:
                 descuentos_ccaf_leasing = ""
 
-            # Campo 88 — Descuentos por seguro de vida
-            ccaf_insurance = employee.ccaf_deduction_ids.filtered(
-                lambda c: c.active and c.deduction_type == 'insurance'
-            )
-            if ccaf_insurance:
-                    # Sumar todas las cuotas mensuales de seguros activos
-                    total_insurance = sum(ccaf_insurance.mapped('total_amount'))
-                    renta_imponible_ips_ex_caja = f"{int(total_insurance):08d}"  
+            # Campo 88 — Descuentos por seguro de vida (desde regla CCAF_SEG_VIDA)
+            total_ccaf_seguro = self._get_payslip_lines(payslip, rule_codes=['CCAF_SEG_VIDA']) or 0
+            if total_ccaf_seguro > 0:
+                renta_imponible_ips_ex_caja = f"{int(total_ccaf_seguro):08d}"
             else:
                 renta_imponible_ips_ex_caja = ""
        
@@ -1582,32 +1532,12 @@ class PreviredExportController(http.Controller):
             else:
                 tipo_jornada = "0"
 
-            # Campo 94 — Cotización Expectativa de Vida - Monto en $ de cotización aporte empleador - CQ - Seguro de social
-            if afp_code != "00" and contract.pension_option == "afp": 
-                expectativa_vida = previred_indicator.expectativa_vida / 100
-                renta_imponible_valor = renta_imponible('afp')
-                tiene_licencia = False
-                
-                if hasattr(payslip, 'previred_movement_ids'):
-                    employee_movements = payslip.previred_movement_ids
-                    for movement in employee_movements:
-                        if movement.code in ["3", "6"]:
-                            tiene_licencia = True
-                            break
-                
-                if tiene_licencia:
-                    dias_licencia = self._calculate_license_days(payslip)
-
-                    # Si tiene licencia del mes completo usa el completo del RIMA (Renta Imponible Mes Anterior)
-                    if dias_licencia >= 30:
-                        cotizacion_expectativa_vida = round(float(renta_imponible_licencia) * expectativa_vida)
-                    else:
-                        # Si no es mes completo, usa la suma de lo trabajado + RIMA proporcional
-                        rima_proporcional = round((float(renta_imponible_licencia) / 30) * dias_licencia)   
-                        print( "RIMA Proporcional:", rima_proporcional )     
-                        cotizacion_expectativa_vida = round((renta_imponible_valor + rima_proporcional) * expectativa_vida)
-                else:
-                    cotizacion_expectativa_vida = round(renta_imponible_valor * expectativa_vida)
+            # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
+            # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
+            # recalcularlo aquí, para que TXT y liquidación queden siempre consistentes.
+            if afp_code != "00" and contract.pension_option == "afp":
+                total_exp_vida = self._get_payslip_lines(payslip, rule_codes=['EXP_VIDA']) or 0
+                cotizacion_expectativa_vida = int(round(total_exp_vida))
             else:
                 cotizacion_expectativa_vida = "0"
 
