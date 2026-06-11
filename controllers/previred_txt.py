@@ -400,9 +400,9 @@ class PreviredExportController(http.Controller):
 
             # Campo 12 — Tipo de Trabajador
             worker_type = '0'
-            # Tipo 2: Pensionado mayor de 65 años sin cotización AFP
-            if  contract.is_retired_elderly:
-                worker_type = '2'
+            # Pensionado: tipo 2 si no cotiza (Sin Institución Previsional), tipo 1 si cotiza (AFP/IPS)
+            if contract.is_retired_elderly:
+                worker_type = '2' if contract.pension_option == 'sip' else '1'
             elif employee.birthday:
                 today = period_dt.date()
                 age = today.year - employee.birthday.year - ((today.month, today.day) < (employee.birthday.month, employee.birthday.day))
@@ -745,11 +745,7 @@ class PreviredExportController(http.Controller):
                 renta_imponible_ccaf = ""
 
             # Campo 85 — Cotización CCAF (desde regla CCAF_CREDITO)
-            total_ccaf_credito = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
-            if total_ccaf_credito > 0:
-                creditos_personales_ccaf = f"{int(total_ccaf_credito):08d}"
-            else:
-                creditos_personales_ccaf = ""
+            creditos_personales_ccaf = self._get_payslip_lines(payslip, rule_codes=['CCAF_CREDITO']) or 0
 
             # Campo 86 — Descuento Dental CCAF
             # TODO APLICAR PARA CAJA LOS HEROES
@@ -1124,9 +1120,9 @@ class PreviredExportController(http.Controller):
 
             # Campo 12 — Tipo de Trabajador
             worker_type = '0'
-            # Tipo 2: Pensionado mayor de 65 años sin cotización AFP
-            if  contract.is_retired_elderly:
-                worker_type = '2'
+            # Pensionado: tipo 2 si no cotiza (Sin Institución Previsional), tipo 1 si cotiza (AFP/IPS)
+            if contract.is_retired_elderly:
+                worker_type = '2' if contract.pension_option == 'sip' else '1'
             elif employee.birthday:
                 today = period_dt.date()
                 age = today.year - employee.birthday.year - ((today.month, today.day) < (employee.birthday.month, employee.birthday.day))

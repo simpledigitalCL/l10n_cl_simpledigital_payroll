@@ -2036,7 +2036,8 @@ result = int(round(
     afp + salud + afc + apvi + apvc_t + apvc_e + cuenta2 +
     isapre_extra + impuesto + ccaf_credit + ccaf_dental + ccaf_seguro +
     ccaf_ahorro + ccaf_otros + anticipos_prestamos
-))]]>
+))
+]]>
             </field>
             <field name="appears_on_payslip">1</field>
         </record>

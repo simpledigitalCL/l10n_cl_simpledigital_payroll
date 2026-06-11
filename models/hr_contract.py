@@ -143,7 +143,7 @@ class HrContractInherit(models.Model):
   
     # Pensiones
     is_retired_elderly = fields.Boolean(
-        string='Pensionado por vejez',
+        string='Pensionado',
         default=False,
         required=True,
         help='Indica si el empleado está pensionado por vejez (Campo 1109 Libro de Remuneraciones)',
