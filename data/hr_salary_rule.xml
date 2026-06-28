@@ -230,10 +230,12 @@ result = contract.extra_hours and contract.extra_hours > 0
 result = 0
 if contract:
     if contract.extra_hours and contract.extra_hours > 0:
+        # Valor hora extra (incluye recargo legal del 50%).
+        # Jornada 42 hrs (vigente desde mayo 2026): factor mensual 0,0083333 = (1/30 * 28 / 168) * 1.5
         if contract.hourly_wage > 0:
-            hourly_rate = contract.hourly_wage
+            hourly_rate = contract.hourly_wage * 1.5
         elif contract.wage > 0:
-            hourly_rate = contract.wage * 0.0079545
+            hourly_rate = contract.wage * 0.0083333
         else:
             hourly_rate = 0
 

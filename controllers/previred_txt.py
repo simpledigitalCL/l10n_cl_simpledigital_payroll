@@ -12,46 +12,34 @@ _logger = logging.getLogger(__name__)
 # https://www.previred.com/wp-content/uploads/2025/07/FormatoLargoFijoPorPosicion-Reforma-1.pdf
 class PreviredExportController(http.Controller):    
     
+    # Códigos de entrada de trabajo que representan AUSENCIA (no remunerada o
+    # informada aparte) y por lo tanto restan días trabajados en Previred.
+    # Cualquier otro código (WORK100, WORK110, OVERTIME, LEAVECL120 vacaciones,
+    # LEAVE120/LEAVE105/LEAVE100 permisos pagados, ACCTR, etc.) se considera
+    # día trabajado/remunerado.
+    ABSENCE_WORK_ENTRY_CODES = ["LIC", "FALT", "OUT", "LEAVE90", "LEAVECL130", "PSGS"]
+
     def _get_real_worked_days_from_payslip(self, payslip):
         """
-        Retorna los días trabajados reales desde hr.payslip.worked_days,
-        sumando únicamente asistencia + vacaciones.
-        Si no existe línea de asistencia y sobran días hasta completar 30,
-        se agrega la diferencia como días trabajados.
+        Días trabajados para Previred = 30 - días de ausencia.
+
+        El mes previsional siempre es de 30 días. En lugar de enumerar cada
+        código que cuenta como trabajado, se restan los días de ausencia
+        (ver ABSENCE_WORK_ENTRY_CODES): así cualquier tipo de entrada nuevo
+        que no sea una ausencia se trata automáticamente como día trabajado.
         """
         if not payslip:
             return 0
-    
-        total_days = 0
-        vac_days = 0
-        asistencia_days = 0
-    
-        for line in payslip.worked_days_line_ids:
-            code = line.work_entry_type_id.code or ""
-            if code == "WORK100":
-                asistencia_days += line.number_of_days or 0
-            elif code == "LEAVECL120":
-                vac_days += line.number_of_days or 0
-    
-        total_days = asistencia_days + vac_days
-    
-        # Forzar a que nunca supere 30
-        if total_days > 30:
-            total_days = 30
-    
-        # Si no hay asistencia registrada y faltan días para completar 30,
-        # se asume que los días restantes fueron trabajados.
-        if total_days < 30:
-            total_days += (30 - (vac_days + asistencia_days + self._get_absent_days(payslip)))
-    
-        return int(total_days)
-    
+
+        worked_days = 30 - self._get_absent_days(payslip)
+        return int(max(0, min(30, worked_days)))
+
     def _get_absent_days(self, payslip):
-        """Cuenta días de licencias/faltas (que no son trabajados)."""
+        """Cuenta días de ausencia (no trabajados) que restan días trabajados."""
         absent = 0
         for line in payslip.worked_days_line_ids:
             code = line.work_entry_type_id.code or ""
-            if code in ["LIC", "FALT","OUT", "LEAVE90"]:
+            if code in self.ABSENCE_WORK_ENTRY_CODES:
                 absent += line.number_of_days or 0
         return absent
 
@@ -648,8 +636,14 @@ class PreviredExportController(http.Controller):
             else:
                 cotizacion_fonasa = ""
 
-            # Campo 71 — Cotización Acc. Trabajo (ISL) (vacío por defecto)
-            cotizacion_acc_trabajo_isl = ""
+            # Campo 71 — Cotización Acc. Trabajo (ISL)
+            # Si la empresa no está afiliada a una mutual (ISL: '00' / 'Sin Mutual - ISL'),
+            # el aporte de accidentes del trabajo se informa aquí (regla APORTE_MUTUAL).
+            _company_mutual = contract.employee_id.company_id
+            if _company_mutual.has_mutual and _company_mutual.mutual and _company_mutual.mutual != '00':
+                cotizacion_acc_trabajo_isl = ""
+            else:
+                cotizacion_acc_trabajo_isl = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
 
             # Campo 72 — Bonificación Ley 15.386 (vacío por defecto)
             bonificacion_ley_15386 = ""
@@ -843,7 +837,11 @@ class PreviredExportController(http.Controller):
             renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
             
             # Campo 98 – Cotización por Accidente del Trabajo (MUTUAL)
-            cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
+            # Solo se informa si la empresa está afiliada a una mutual; con ISL el aporte va en el Campo 71.
+            if company.has_mutual and company.mutual and company.mutual != '00':
+                cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
+            else:
+                cotizacion_accidente_trabajo_mutual = ""
 
             # Campo 99 — Sucursal para pago Mutual 
             campo_adicional_99 = ""
@@ -1358,8 +1356,14 @@ class PreviredExportController(http.Controller):
             else:
                 cotizacion_fonasa = ""
 
-            # Campo 71 — Cotización Acc. Trabajo (ISL) (vacío por defecto)
-            cotizacion_acc_trabajo_isl = ""
+            # Campo 71 — Cotización Acc. Trabajo (ISL)
+            # Si la empresa no está afiliada a una mutual (ISL: '00' / 'Sin Mutual - ISL'),
+            # el aporte de accidentes del trabajo se informa aquí (regla APORTE_MUTUAL).
+            _company_mutual = contract.employee_id.company_id
+            if _company_mutual.has_mutual and _company_mutual.mutual and _company_mutual.mutual != '00':
+                cotizacion_acc_trabajo_isl = ""
+            else:
+                cotizacion_acc_trabajo_isl = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
 
             # Campo 72 — Bonificación Ley 15.386 (vacío por defecto)
             bonificacion_ley_15386 = ""
@@ -1555,7 +1559,11 @@ class PreviredExportController(http.Controller):
             renta_imponible_mutual = int(min(self._get_payslip_lines(payslip, rule_codes=['GROSS']), previred_indicator.tope_afiliados_afp) or 0)
             
             # Campo 98 – Cotización por Accidente del Trabajo (MUTUAL)
-            cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
+            # Solo se informa si la empresa está afiliada a una mutual; con ISL el aporte va en el Campo 71.
+            if company.has_mutual and company.mutual and company.mutual != '00':
+                cotizacion_accidente_trabajo_mutual = self._get_payslip_lines(payslip, ['APORTE_MUTUAL']) or 0
+            else:
+                cotizacion_accidente_trabajo_mutual = ""
 
             # Campo 99 — Sucursal para pago Mutual 
             campo_adicional_99 = ""

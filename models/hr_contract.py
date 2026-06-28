@@ -34,8 +34,9 @@ class HrContractInherit(models.Model):
     extra_hours = fields.Integer(
         string="Horas Extras Pactadas", 
         help="Cantidad de horas extras pactadas para el mes. "
-        "El cálculo se realiza como: " 
-        "((Sueldo base mensual / 30 días / 8 horas) * 1.5) * horas pactadas. "
+        "El cálculo se realiza como: "
+        "((Sueldo base mensual / 30 * 28 / 168) * 1.5) * horas pactadas, "
+        "equivalente a Sueldo mensual * 0,0083333 * horas pactadas (jornada 42 hrs, vigente desde mayo 2026). "
         "Corresponde al valor hora con recargo legal del 50%."
     )
 
@@ -370,8 +371,11 @@ class HrContractInherit(models.Model):
                     # Calcular días trabajados
                     today = date.today()
                     months = (today.year - start_date.year) * 12 + (today.month - start_date.month)
-                    
-                    days = round((months / 12) * 15, 2)
+
+                    # Derecho anual = 15 días legales + días progresivos del Art. 68.
+                    progressive = contract.employee_id.l10n_cl_progressive_vacation_days or 0
+                    annual_days = 15 + progressive
+                    days = round((months / 12) * annual_days, 2)
                     
                     logging.info(f"Contrato {contract.id}: {months} meses, {days} días de vacaciones")
                     
@@ -416,13 +420,21 @@ class HrContractInherit(models.Model):
                 logging.error(f"Error procesando contrato {contract.id}: {str(e)}")
 
     # Actualiza solo los días acumulados sin modificar la fecha de validez
-    def _increment_vacation_allocation(self, days_increment=1.25):
+    def _increment_vacation_allocation(self, days_increment=None):
         for contract in self:
             try:
                 with self.env.cr.savepoint():
                     if not contract.employee_id:
                         logging.warning(f"Contrato {contract.id} no tiene empleado asociado")
                         continue
+
+                    # Incremento mensual = (15 días legales + progresivos Art. 68) / 12.
+                    # Si se pasa days_increment explícito, se respeta ese valor.
+                    if days_increment is None:
+                        progressive = contract.employee_id.l10n_cl_progressive_vacation_days or 0
+                        increment = round((15 + progressive) / 12.0, 2)
+                    else:
+                        increment = days_increment
 
                     holiday_status = self.env.ref(
                         'l10n_cl_simpledigital_payroll.hr_leave_type_vacaciones_legales',
@@ -439,14 +451,14 @@ class HrContractInherit(models.Model):
                     ], order='date_from desc,id desc', limit=1)
 
                     if allocation:
-                        new_days = round(allocation.number_of_days + days_increment, 2)
+                        new_days = round(allocation.number_of_days + increment, 2)
                         allocation.write({
                             'number_of_days': new_days,
                             'name': f'Vacaciones {contract.employee_id.name}',
                         })
                         logging.info(
                             f"Incrementada asignación para {contract.employee_id.name}: "
-                            f"+{days_increment} días (total {new_days})"
+                            f"+{increment} días (total {new_days})"
                         )
                     else:
                         start_date = contract.date_start or date.today()
@@ -454,13 +466,13 @@ class HrContractInherit(models.Model):
                             'name': f'Vacaciones {contract.employee_id.name}',
                             'employee_id': contract.employee_id.id,
                             'holiday_status_id': holiday_status.id,
-                            'number_of_days': days_increment,
+                            'number_of_days': increment,
                             'date_from': start_date,
                         })
                         allocation.action_approve()
                         logging.info(
                             f"Creada asignación inicial para {contract.employee_id.name}: "
-                            f"{days_increment} días desde {start_date}"
+                            f"{increment} días desde {start_date}"
                         )
             except Exception as e:
                 logging.error(f"Error procesando contrato {contract.id}: {str(e)}")

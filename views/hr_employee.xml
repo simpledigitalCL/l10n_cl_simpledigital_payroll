@@ -140,5 +140,29 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Vacaciones Progresivas (Art. 68) -->
+    <record id="view_employee_form_inherit_progressive_vacation" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.progressive.vacation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_payroll']" position="after">
+                <page string="Vacaciones Progresivas" name="progressive_vacation">
+                    <group>
+                        <group string="Antigüedad (Art. 68 Código del Trabajo)">
+                            <field name="l10n_cl_current_employer_months"/>
+                            <field name="l10n_cl_prev_employer_months"/>
+                            <field name="l10n_cl_progressive_cert_validated"/>
+                            <field name="l10n_cl_total_contributed_months"/>
+                        </group>
+                        <group string="Días progresivos">
+                            <field name="l10n_cl_progressive_vacation_days"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
 </odoo>
  

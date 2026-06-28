@@ -96,7 +96,7 @@ class HrEmployeeMovementLine(models.Model):
         store = True,
         compute='_compute_amount',
         inverse='_inverse_amount',
-        help='Monto asociado al movimiento. En caso de ser horas, se calculará el automaticamente con el calculo del sueldo * 0,0079545',
+        help='Monto asociado al movimiento. En caso de ser horas, se calculará automáticamente con el cálculo del sueldo * 0,0083333 (factor hora extra jornada 42 hrs, vigente desde mayo 2026)',
     )
     hours = fields.Float(
         string='Horas', 
@@ -146,7 +146,7 @@ class HrEmployeeMovementLine(models.Model):
                 if contract and getattr(contract, 'hourly_wage', 0) and contract.hourly_wage > 0:
                     rec.amount = contract.hourly_wage * 1.5 * rec.hours
                 elif contract and getattr(contract, 'wage', 0) and contract.wage > 0:
-                    rec.amount = (contract.wage * 0.0079545) * rec.hours
+                    rec.amount = (contract.wage * 0.0083333) * rec.hours
                 else:
                     rec.amount = 0.0
             else:
@@ -161,7 +161,7 @@ class HrEmployeeMovementLine(models.Model):
                 if contract and getattr(contract, 'hourly_wage', 0) and contract.hourly_wage > 0:
                     rec.amount = contract.hourly_wage * 1.5 * rec.hours
                 elif contract and getattr(contract, 'wage', 0) and contract.wage > 0:
-                    rec.amount = (contract.wage * 0.0079545) * rec.hours
+                    rec.amount = (contract.wage * 0.0083333) * rec.hours
                 else:
                     rec.amount = 0.0
 

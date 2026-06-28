@@ -1,9 +1,15 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from datetime import date
 import re
 import logging
 
 _logger = logging.getLogger(__name__)
+
+# Días de vacaciones legales base en Chile (Art. 67 Código del Trabajo).
+LEGAL_VACATION_DAYS = 15
+
+
 class HrEmployeeInherit(models.Model):
     _inherit = 'hr.employee'
 
@@ -31,6 +37,82 @@ class HrEmployeeInherit(models.Model):
         tracking=True,
         groups="hr.group_hr_user"
     )
+
+    # --- Vacaciones progresivas (Art. 68 Código del Trabajo) ---
+    # Meses de cotización acreditados con empleadores ANTERIORES, ingresados a mano
+    # y respaldados por el certificado de cotizaciones (AFP / Dirección del Trabajo).
+    l10n_cl_prev_employer_months = fields.Integer(
+        string="Meses cotizados con empleadores anteriores",
+        default=0,
+        tracking=True,
+        groups="hr.group_hr_user",
+        help="Meses de cotización acreditados con empleadores anteriores, respaldados "
+             "por el certificado de cotizaciones. Se usan para el requisito de 10 años "
+             "(120 meses) del Art. 68. Solo se consideran si el certificado está validado.",
+    )
+    l10n_cl_progressive_cert_validated = fields.Boolean(
+        string="Certificado de cotizaciones validado",
+        default=False,
+        tracking=True,
+        groups="hr.group_hr_user",
+        help="Marcar cuando RR.HH. haya verificado el certificado de cotizaciones que "
+             "respalda los meses con empleadores anteriores. Mientras no esté validado, "
+             "esos meses no se consideran para el Art. 68.",
+    )
+    l10n_cl_current_employer_months = fields.Integer(
+        string="Meses con el empleador actual",
+        compute="_compute_progressive_vacation_days",
+        groups="hr.group_hr_user",
+        help="Antigüedad en meses con el empleador actual, calculada desde la fecha de "
+             "inicio del contrato más antiguo del empleado.",
+    )
+    l10n_cl_total_contributed_months = fields.Integer(
+        string="Meses cotizados (total)",
+        compute="_compute_progressive_vacation_days",
+        groups="hr.group_hr_user",
+        help="Suma de meses con empleadores anteriores (si el certificado está validado) "
+             "y meses con el empleador actual.",
+    )
+    l10n_cl_progressive_vacation_days = fields.Integer(
+        string="Días de vacaciones progresivas (Art. 68)",
+        compute="_compute_progressive_vacation_days",
+        groups="hr.group_hr_user",
+        help="Días adicionales de vacaciones por antigüedad. Requiere 10 años (120 meses) "
+             "cotizados en total y al menos 3 años con el empleador actual; se suma 1 día "
+             "por cada 3 años (36 meses) completos con el empleador actual.",
+    )
+
+    @api.depends('contract_ids.date_start', 'contract_ids.state',
+                 'l10n_cl_prev_employer_months', 'l10n_cl_progressive_cert_validated')
+    def _compute_progressive_vacation_days(self):
+        today = date.today()
+        for employee in self:
+            # Antigüedad con el empleador actual: desde el contrato más antiguo.
+            start_dates = employee.contract_ids.filtered('date_start').mapped('date_start')
+            if start_dates:
+                start = min(start_dates)
+                current_months = (today.year - start.year) * 12 + (today.month - start.month)
+                current_months = max(current_months, 0)
+            else:
+                current_months = 0
+
+            # Los meses con empleadores anteriores solo cuentan con certificado validado.
+            prev_months = (
+                employee.l10n_cl_prev_employer_months
+                if employee.l10n_cl_progressive_cert_validated else 0
+            )
+            total_months = prev_months + current_months
+
+            # Art. 68: 10 años (120 meses) totales + 3 años (36 meses) con el empleador
+            # actual dan +1 día; cada 3 años adicionales con el mismo empleador, +1 día más.
+            if total_months >= 120 and current_months >= 36:
+                progressive = current_months // 36
+            else:
+                progressive = 0
+
+            employee.l10n_cl_current_employer_months = current_months
+            employee.l10n_cl_total_contributed_months = total_months
+            employee.l10n_cl_progressive_vacation_days = progressive
 
     # Campos computados para visibilidad de páginas 
     ccaf_deduction_ids = fields.One2many(

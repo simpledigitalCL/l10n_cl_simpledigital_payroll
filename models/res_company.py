@@ -71,7 +71,7 @@ class ResCompany(models.Model):
         string="Mutual de Seguridad",
         help="Selecciona la mutual de seguridad asociada a esta empresa.",
         selection=[
-            ('00', 'Sin Mutual'),
+            ('00', 'Sin Mutual - ISL'),
             ('01', 'Asociación Chilena de Seguridad (ACHS)'),
             ('02', 'Mutual de Seguridad CCHC'),
             ('03', 'Instituto de Seguridad del Trabajo I.S.T.'),
