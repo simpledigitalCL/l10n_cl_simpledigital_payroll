@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime, time as dt_time
+from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import logging
@@ -6,6 +7,10 @@ _logger = logging.getLogger(__name__)
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
+
+    PREVIRED_ABSENCE_WORK_ENTRY_CODES = (
+        'LIC', 'FALT', 'OUT', 'LEAVE90', 'LEAVECL130', 'PSGS',
+    )
 
     previred_movement_ids = fields.One2many(
         'hr.previred.movement',
@@ -18,6 +23,55 @@ class HrPayslip(models.Model):
         compute='_compute_overtime_hours',
         help='Total de horas extras no pactadas del empleado en el período de la nómina'
     )
+
+    def _dias_trabajados_previred(self):
+        """Días trabajados para Previred, con base previsional máxima de 30."""
+        self.ensure_one()
+
+        absent_days = sum(
+            line.number_of_days or 0
+            for line in self.worked_days_line_ids
+            if (line.work_entry_type_id.code or '')
+            in self.PREVIRED_ABSENCE_WORK_ENTRY_CODES
+        )
+        worked_days = 30 - absent_days
+
+        contract = self.contract_id
+        if contract and self.date_from and self.date_to:
+            if contract.date_start and contract.date_start > self.date_from:
+                days_before_start = (contract.date_start - self.date_from).days
+                worked_days = min(worked_days, 30 - days_before_start)
+
+            if contract.date_end and contract.date_end < self.date_to:
+                active_from = max(self.date_from, contract.date_start or self.date_from)
+                active_days = max(0, (contract.date_end - active_from).days + 1)
+                worked_days = min(worked_days, active_days)
+
+        return int(max(0, min(30, worked_days)))
+
+    def _dias_trabajados_renta_protegida(self):
+        """Días que generan CRP de cargo del empleador."""
+        self.ensure_one()
+
+        accident_days = sum(
+            line.number_of_days or 0
+            for line in self.worked_days_line_ids
+            if (line.work_entry_type_id.code or '') == 'ACCTR'
+        )
+        return int(max(0, self._dias_trabajados_previred() - accident_days))
+
+    def _previred_indicador(self):
+        """Indicador del mes de la nómina."""
+        self.ensure_one()
+        if not self.date_from:
+            return self.env['previred.indicator']
+
+        first_day = self.date_from.replace(day=1)
+        next_month = first_day + relativedelta(months=1)
+        return self.env['previred.indicator'].sudo().search([
+            ('date', '>=', first_day),
+            ('date', '<', next_month),
+        ], order='date desc', limit=1)
 
     def compute_sheet(self):
         # Llamamos primero al compute original

@@ -148,10 +148,8 @@
 
                                     <!-- SEGURO SOCIAL -->
                                     <separator string="SEGURO SOCIAL"/>
+                                    <field name="renta_protegida" />
                                     <field name="expectativa_vida" />
-
-                                    <!-- SEGURO DE INVALIDEZ Y SOBREVIVENCIA (SIS) -->
-                                    <separator string="SEGURO DE INVALIDEZ Y SOBREVIVENCIA (SIS)"/>
                                     <field name="tasa_sis" />
 
                                     <separator string="DISTRIBUCIÓN DEL 7% SALUD, PARA EMPLEADORES AFILIADO A CCAF"/>

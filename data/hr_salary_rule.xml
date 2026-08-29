@@ -2003,6 +2003,41 @@ else:
             <field name="appears_on_payslip">1</field>
         </record>
 
+        <!-- Regla Rentabilidad Protegida - Reforma Etapa 2, rige ago-2026 -->
+        <record id="hr_rule_rentabilidad_protegida" model="hr.salary.rule">
+            <field name="name">Rentabilidad Protegida</field>
+            <field name="code">RENT_PROT</field>
+            <field name="category_id" search="[('code','=','DEDU')]"/>
+            <field name="struct_id" search="[('name', '=', 'Nómina Chile')]"/>
+            <field name="sequence">172</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+<![CDATA[
+result = (
+    contract.pension_option == 'afp'
+    and contract.afp_option not in ['00 - 100']
+    and not contract.is_retired_elderly
+)
+]]>
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+<![CDATA[
+result = 0.0
+
+indicator = payslip._previred_indicador()
+tasa = indicator.renta_protegida if indicator else 0.0
+tope = indicator.tope_afiliados_afp if indicator else 0.0
+dias_trabajados = payslip._dias_trabajados_renta_protegida()
+
+if tasa > 0 and dias_trabajados > 0:
+    base = min(categories.get('GROSS', 0.0), tope)
+    result = base * tasa / 100.0
+]]>
+            </field>
+            <field name="appears_on_payslip">1</field>
+        </record>
+
         <record id="hr_rule_total_descuentos" model="hr.salary.rule">
             <field name="name">Total Descuentos</field>
             <field name="code">TOTAL_DSCTOS</field>

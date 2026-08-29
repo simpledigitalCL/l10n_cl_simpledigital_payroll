@@ -11,37 +11,10 @@ _logger = logging.getLogger(__name__)
 
 # https://www.previred.com/wp-content/uploads/2025/07/FormatoLargoFijoPorPosicion-Reforma-1.pdf
 class PreviredExportController(http.Controller):    
-    
-    # Códigos de entrada de trabajo que representan AUSENCIA (no remunerada o
-    # informada aparte) y por lo tanto restan días trabajados en Previred.
-    # Cualquier otro código (WORK100, WORK110, OVERTIME, LEAVECL120 vacaciones,
-    # LEAVE120/LEAVE105/LEAVE100 permisos pagados, ACCTR, etc.) se considera
-    # día trabajado/remunerado.
-    ABSENCE_WORK_ENTRY_CODES = ["LIC", "FALT", "OUT", "LEAVE90", "LEAVECL130", "PSGS"]
 
     def _get_real_worked_days_from_payslip(self, payslip):
-        """
-        Días trabajados para Previred = 30 - días de ausencia.
-
-        El mes previsional siempre es de 30 días. En lugar de enumerar cada
-        código que cuenta como trabajado, se restan los días de ausencia
-        (ver ABSENCE_WORK_ENTRY_CODES): así cualquier tipo de entrada nuevo
-        que no sea una ausencia se trata automáticamente como día trabajado.
-        """
-        if not payslip:
-            return 0
-
-        worked_days = 30 - self._get_absent_days(payslip)
-        return int(max(0, min(30, worked_days)))
-
-    def _get_absent_days(self, payslip):
-        """Cuenta días de ausencia (no trabajados) que restan días trabajados."""
-        absent = 0
-        for line in payslip.worked_days_line_ids:
-            code = line.work_entry_type_id.code or ""
-            if code in self.ABSENCE_WORK_ENTRY_CODES:
-                absent += line.number_of_days or 0
-        return absent
+        """Compatibilidad para los consumidores del exportador Previred."""
+        return payslip._dias_trabajados_previred() if payslip else 0
 
     def _get_payslip_lines(self, payslip, rule_codes=None):
         """
@@ -76,7 +49,7 @@ class PreviredExportController(http.Controller):
             license_days = 0
             for line in payslip.worked_days_line_ids:
                 code = line.work_entry_type_id.code or ""
-                if code in ["LIC"]:
+                if code in ["LIC", "ACCTR"]:
                     license_days += line.number_of_days or 0
 
             # Limitar a un máximo de 30 días
@@ -257,6 +230,22 @@ class PreviredExportController(http.Controller):
                 f"Error calculando renta imponible mes válido para empleado {employee.id}: {str(e)}"
             )
             return 0
+
+    def _calculate_rima_proportional(self, payslip, employee, contract, period_dt,
+                                     previred_indicator, renta_imponible_afp):
+        """Calcula RIMA proporcional a los días de licencia, con tope Previred."""
+        license_days = self._calculate_license_days(payslip)
+        if not license_days:
+            return 0
+
+        rima = self._calculate_renta_imponible_last_month(employee, contract, period_dt)
+        proportional_rima = int(round(rima * license_days / 30.0))
+        tope_afp = int(previred_indicator.tope_afiliados_afp or 0)
+        if tope_afp:
+            available_tope = max(0, tope_afp - int(renta_imponible_afp or 0))
+            proportional_rima = min(proportional_rima, available_tope)
+
+        return proportional_rima
 
     @http.route('/hr_payroll/previred/txt', auth='user')
     def download_previred_txt(self, period=None, company_id=None, **kw):
@@ -802,17 +791,17 @@ class PreviredExportController(http.Controller):
                 for movement in employee_movements:
                     if movement.code in ["3", "6"]:
                         try:
-                            renta_imponible_licencia = self._calculate_renta_imponible_last_month(employee, contract, period_dt)
+                            renta_imponible_licencia = self._calculate_rima_proportional(
+                                payslip, employee, contract, period_dt,
+                                previred_indicator, renta_imponible_afp
+                            )
                         except ValueError as e:
                             _logger.warning(e)
                         break  # si basta con el primero que cumpla
 
 
-            # Campo 93 — Tipo de Jornada - Jornada Completa o Jornada Parcial (Part-time) 
-            if contract.resource_calendar_id.full_time_required_hours >= 30:
-                tipo_jornada = "1"
-            else:
-                tipo_jornada = "0"
+            # Campo 93 — Tipo de Jornada (Tabla N°22 Previred)
+            tipo_jornada = "2" if contract.work_schedule_id == "201" else "1"
 
             # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
             # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
@@ -823,8 +812,13 @@ class PreviredExportController(http.Controller):
             else:
                 cotizacion_expectativa_vida = "0"
 
-            # Campo 95 — Cotización Rentabilidad Protegida - campo a utilizar a partir de agosto 2026
-            cotizacion_rentabilidad_protegida = ""
+            # Campo 95 — Cotización Rentabilidad Protegida (rige desde ago-2026)
+            if afp_code != "00" and contract.pension_option == "afp":
+                cotizacion_rentabilidad_protegida = int(round(
+                    self._get_payslip_lines(payslip, rule_codes=['RENT_PROT']) or 0
+                ))
+            else:
+                cotizacion_rentabilidad_protegida = "0"
 
             # Campo 96 — Código Mutualidad - CS
             company = contract.employee_id.company_id
@@ -953,6 +947,9 @@ class PreviredExportController(http.Controller):
                     asignacion_familiar = "0"
 
                     aditional_line = f"{rut_number};{verification_digit};{paternal_surname};{maternal_surname};{first_name};{previred_gender};{nationality};{payment_type};{period_from};{period_to};{pension_regime};{worker_type};{''};{tipo_linea};{movimiento_personal};{fecha_desde};{fecha_hasta};{tramo_asignacion_familiar};{cargas_simples};{cargas_maternales};{cargas_invalidas};{asignacion_familiar};{asignacion_familiar_retroactiva};{reintegro_cargas_familiares};{subsidio_empleo_joven};{''};{''};{''};{''};{''};{''};{tasa_pactada_sustitutiva};{aporte_indemnizacion_sustitutiva};{num_periodos_sustitutivos};{periodo_desde_sustitutivo};{periodo_hasta_sustitutivo};{puesto_trabajo_pesado};{porcentaje_trabajo_pesado};{cotizacion_trabajo_pesado};{codigo_institucion_apvi};{numero_contrato_apvi};{forma_pago_apvi};{''};{cotizacion_depositos_convenidos};{codigo_institucion_apvc};{numero_contrato_apvc};{forma_pago_apvc};{cotizacion_trabajador_apvc};{''};{rut_afiliado_voluntario};{dv_afiliado_voluntario};{''};{''};{nombres_afiliado_voluntario};{codigo_movimiento_afiliado_voluntario};{fecha_desde_afiliado_voluntario};{fecha_hasta_afiliado_voluntario};{codigo_afp_afiliado_voluntario};{monto_capitalizacion_voluntaria};{monto_ahorro_voluntario};{numero_periodos_cotizacion};{codigo_ex_caja_regimen};{''};{''};{cotizacion_obligatoria_ips};{renta_imponible_desahucio};{codigo_ex_caja_regimen_desahucio};{tasa_cotizacion_desahucio_ex_cajas};{cotizacion_desahucio};{''};{cotizacion_acc_trabajo_isl};{bonificacion_ley_15386};{descuento_cargas_familiares_ips};{bonos_gobierno};{codigo_institucion_salud};{numero_fun};{renta_imponible_isapre};{moneda_plan_isapre};{cotizacion_pactada};{cotizacion_obligatoria};{cotizacion_salud_adicional};{monto_ges};{codigo_ccaf};{''};{creditos_personales_ccaf};{codigo_ex_caja_regimen_ips};{descuentos_ccaf_leasing};{''};{cotizacion_ips_ex_caja};{''};{''};{''};{tipo_jornada};{''};{cotizacion_rentabilidad_protegida};{''};{''};{''};{''};{''};{''};{''};{rut_pagadora_subsidio};{dv_pagadora_subsidio};{centro_costos}"
+                    additional_fields = aditional_line.split(';')
+                    additional_fields[94] = ""
+                    aditional_line = ';'.join(additional_fields)
                     lines.append(aditional_line)
                     # _logger.info(f"Línea adicional por movimiento de personal {movimiento_personal} para {first_name} {paternal_surname} {maternal_surname}")
                     
@@ -1524,17 +1521,17 @@ class PreviredExportController(http.Controller):
                 for movement in employee_movements:
                     if movement.code in ["3", "6"]:
                         try:
-                            renta_imponible_licencia = self._calculate_renta_imponible_last_month(employee, contract, period_dt)
+                            renta_imponible_licencia = self._calculate_rima_proportional(
+                                payslip, employee, contract, period_dt,
+                                previred_indicator, renta_imponible_afp
+                            )
                         except ValueError as e:
                             _logger.warning(e)
                         break  # si basta con el primero que cumpla
 
 
-            # Campo 93 — Tipo de Jornada - Jornada Completa o Jornada Parcial (Part-time) 
-            if contract.resource_calendar_id.full_time_required_hours >= 30:
-                tipo_jornada = "1"
-            else:
-                tipo_jornada = "0"
+            # Campo 93 — Tipo de Jornada (Tabla N°22 Previred)
+            tipo_jornada = "2" if contract.work_schedule_id == "201" else "1"
 
             # Campo 94 — Cotización Expectativa de Vida (Seguro Social) — desde regla EXP_VIDA (SIM-266)
             # Se toma el valor ya calculado en la liquidación (regla EXP_VIDA) en lugar de
@@ -1545,8 +1542,13 @@ class PreviredExportController(http.Controller):
             else:
                 cotizacion_expectativa_vida = "0"
 
-            # Campo 95 — Cotización Rentabilidad Protegida - campo a utilizar a partir de agosto 2026
-            cotizacion_rentabilidad_protegida = ""
+            # Campo 95 — Cotización Rentabilidad Protegida (rige desde ago-2026)
+            if afp_code != "00" and contract.pension_option == "afp":
+                cotizacion_rentabilidad_protegida = int(round(
+                    self._get_payslip_lines(payslip, rule_codes=['RENT_PROT']) or 0
+                ))
+            else:
+                cotizacion_rentabilidad_protegida = "0"
 
             # Campo 96 — Código Mutualidad - CS
             company = contract.employee_id.company_id
@@ -1719,7 +1721,7 @@ class PreviredExportController(http.Controller):
                         numero_fun, renta_imponible_isapre, moneda_plan_isapre, cotizacion_pactada, cotizacion_obligatoria,
                         cotizacion_salud_adicional, monto_ges, codigo_ccaf, "", creditos_personales_ccaf,
                         codigo_ex_caja_regimen_ips, descuentos_ccaf_leasing, "", cotizacion_ips_ex_caja, "",
-                        "", "", tipo_jornada, "", cotizacion_rentabilidad_protegida,
+                        "", "", tipo_jornada, "", "",
                         "", "", "", "", "",
                         "", "", rut_pagadora_subsidio, dv_pagadora_subsidio, centro_costos
                     ]
@@ -1736,4 +1738,3 @@ class PreviredExportController(http.Controller):
                 ('Content-Disposition', f'attachment; filename="previred_{period_str}.csv"')
             ]
         )
-

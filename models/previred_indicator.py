@@ -145,6 +145,10 @@ class PreviredIndicator(models.Model):
     )
 
     # SEGURO SOCIAL
+    renta_protegida = fields.Float(
+        string="Renta Protegida",
+    )
+
     expectativa_vida = fields.Float(
         string="Expectativa de Vida",
     )
@@ -457,13 +461,22 @@ class PreviredIndicator(models.Model):
                                 label = tds[0].get_text(strip=True).upper()
                                 value = tds[1].get_text(strip=True)
 
-                                if "EXPECTATIVA DE VIDA" in label and "%" in value:
+                                if (
+                                    "RENTA PROTEGIDA" in label
+                                    or "RENTABILIDAD PROTEGIDA" in label
+                                ) and "%" in value:
+                                    try:
+                                        valor_float = float(value.replace("%", "").replace(",", ".").strip())
+                                        self.renta_protegida = valor_float
+                                        seguro_social_found = True
+                                    except ValueError:
+                                        _logger.warning(f"No se pudo convertir a float: {value}")
+
+                                elif "EXPECTATIVA DE VIDA" in label and "%" in value:
                                     try:
                                         valor_float = float(value.replace("%", "").replace(",", ".").strip())
                                         self.expectativa_vida = valor_float
-                                        # _logger.info(f"Expectativa de Vida: {self.expectativa_vida}%")
                                         seguro_social_found = True
-                                        break
                                     except ValueError:
                                         _logger.warning(f"No se pudo convertir a float: {value}")
 

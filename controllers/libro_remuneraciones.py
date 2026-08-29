@@ -135,11 +135,8 @@ class LibroRemuneracionesController(http.Controller):
         return 0
     
     def _get_real_worked_days_from_payslip(self, payslip):
-        """
-        Retorna los días trabajados reales desde hr.payslip.worked_days.
-        Toma el valor de number_of_days del código WORK100 directamente.
-        """
-        return self._get_days_by_work_entry_code(payslip, "WORK100")
+        """Retorna los días trabajados Previred desde la liquidación."""
+        return payslip._dias_trabajados_previred() if payslip else 0
     
     def _get_absent_days(self, payslip):
         """Cuenta días de licencias/faltas (que no son trabajados)."""
@@ -1077,7 +1074,14 @@ class LibroRemuneracionesController(http.Controller):
         aporte_adicional_trabajo_pesado = 0
 
         # Campo 130 - 4155 Aporte empleador seguro invalidez y sobrevivencia Int 8 OBLIGATORIO
-        aporte_empleador_seguro_invalidez = self._get_payslip_lines(payslip, ["SIS"]) or 0
+        """
+            Corresponde a la suma de los aportes del empleador al seguro de invalidez y sobrevivencia (SIS) y al seguro de renta protegida (RENT_PROT).
+            ** Estos campos estan agregados aqui porque todavia LRE no tiene un campo espefico para alojarlos**
+        """
+        aporte_empleador_seguro_invalidez = (
+            (self._get_payslip_lines(payslip, ["SIS"]) or 0) +
+            (self._get_payslip_lines(payslip, ["RENT_PROT"]) or 0)
+        )
 
         # Campo 133 - 5210 Total haberes imponibles y tributables Int 8 OBLIGATORIO
         """
